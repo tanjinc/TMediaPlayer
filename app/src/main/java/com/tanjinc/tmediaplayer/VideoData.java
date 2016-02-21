@@ -9,7 +9,7 @@ import android.widget.ImageView;
 public class VideoData {
     private String name;
     private String path;
-    private Bitmap thumbnail;
+    public Bitmap thumbnail;
     private String parentDir;
 
     public String getName() {

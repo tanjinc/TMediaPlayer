@@ -12,8 +12,5 @@
     tools:context="com.tanjinc.tmediaplayer.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />
+    <include layout="@layout/fragment_container"/>
 </RelativeLayout>

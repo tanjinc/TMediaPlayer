@@ -18,9 +18,15 @@ public class LocalVideoAdapter extends BaseAdapter {
     private ArrayList<VideoData> mVideoList;
     private Context mContext;
 
+
     public LocalVideoAdapter(Context context, ArrayList<VideoData> videolist) {
         mContext = context;
         mVideoList = videolist;
+    }
+
+    public void getVideoList(ArrayList list) {
+        mVideoList = list;
+        notifyDataSetChanged();
     }
 
     @Override

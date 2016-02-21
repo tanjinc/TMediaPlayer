@@ -20,35 +20,31 @@ public class LocalVideoFragment extends ListFragment {
     private VideoProviderAsyncTask mProvider;
     private Context mContext;
     private ArrayList<VideoData> mVideoList;
-    private ListView mListView;
-
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        mContext = getActivity();
-//        mProvider = new VideoProviderAsyncTask(mContext, this);
-//        mAdapter = new LocalVideoAdapter(mContext, mVideoList);
-//
-//        mProvider.execute();
+        mContext = getActivity();
+        mAdapter = new LocalVideoAdapter(mContext, null);
+        mProvider = new VideoProviderAsyncTask(mContext, this);
+
+        mProvider.execute();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-//        View view = inflater.inflate(R.layout.fragment_container, container, false);
+        View view = inflater.inflate(R.layout.fragment_container, container, false);
 
-//        mListView = (ListView) view.findViewById(R.id.list_view);
-//        mListView.setAdapter(mAdapter);
-        return super.onCreateView(inflater, container, savedInstanceState);
+        setListAdapter(mAdapter);
+        return view;
     }
 
-
-    public void notifyDataChange(ArrayList videolist) {
-//        mVideoList = videolist;
-//        mAdapter.notifyDataSetChanged();
+    public void getVideoList(ArrayList videoList) {
+        mAdapter.getVideoList(videoList);
     }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
