@@ -78,6 +78,6 @@ public class VideoProviderAsyncTask extends AsyncTask<VideoData, VideoData, Arra
     @Override
     protected void onPostExecute(ArrayList<VideoData> videoDatas) {
         super.onPostExecute(videoDatas);
-        mFragment.getVideoList(videoDatas);
+        mFragment.setVideoList(videoDatas);
     }
 }

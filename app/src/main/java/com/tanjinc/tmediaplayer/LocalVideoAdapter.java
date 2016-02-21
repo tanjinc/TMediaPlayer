@@ -24,7 +24,7 @@ public class LocalVideoAdapter extends BaseAdapter {
         mVideoList = videolist;
     }
 
-    public void getVideoList(ArrayList list) {
+    public void setVideoList(ArrayList list) {
         mVideoList = list;
         notifyDataSetChanged();
     }
