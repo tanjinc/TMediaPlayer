@@ -61,8 +61,8 @@ public class LocalVideoFragment extends ListFragment {
 
     private void startVideoPlayerActivity(Uri uri) {
         Intent intent = new Intent(getActivity(), VideoPlayActivity.class);
-//        intent.setData(uri);
-        startActivity(intent);
+        intent.setData(uri);
+        getActivity().startActivity(intent);
     }
 
     public void setVideoList(ArrayList videoList) {

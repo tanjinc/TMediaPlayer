@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.util.Log;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.tanjinc.tmediaplayer.R;
 
@@ -15,18 +17,31 @@ import com.tanjinc.tmediaplayer.R;
 public class VideoPlayActivity extends Activity {
     private static final String TAG = "VideoPlayActivity";
 
+    private MoviePlayer mPlayer;
+    private FrameLayout mRoot;
     private Uri mUri;
 
     @Override
-    public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
-        super.onCreate(savedInstanceState, persistentState);
-        Log.d(TAG, "video onCreate");
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.player_root);
-        getDataFromIntent(getIntent());
+        mRoot = (FrameLayout) findViewById(R.id.root);
+        mUri = getDataFromIntent(getIntent());
+        initPlayer();
+
+        mPlayer.setUrl(mUri);
+
     }
 
-    private void getDataFromIntent(Intent intent) {
-        mUri = intent.getData();
+
+    private void initPlayer() {
+        mPlayer = new MoviePlayer(this);
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        mRoot.addView(mPlayer, lp);
+    }
+
+    private Uri getDataFromIntent(Intent intent) {
         Log.d(TAG, "video mUri = " + mUri);
+        return intent.getData();
     }
 }
