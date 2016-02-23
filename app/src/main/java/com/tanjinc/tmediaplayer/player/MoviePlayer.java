@@ -24,6 +24,7 @@ public class MoviePlayer extends FrameLayout {
 
     public void setUrl(Uri uri) {
         mVideoView.setVisibility(VISIBLE);
-        mVideoView.setUri(uri);
+        mVideoView.setVideoURI(uri);
+        mVideoView.start();
     }
 }
