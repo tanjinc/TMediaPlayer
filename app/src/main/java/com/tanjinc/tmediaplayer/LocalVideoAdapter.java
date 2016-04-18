@@ -71,6 +71,7 @@ public class LocalVideoAdapter extends BaseAdapter {
         VideoData videoData = (VideoData) getItem(position);
         viewHolder.displayName.setText(videoData.getName());
         viewHolder.path.setText(videoData.getPath());
+//        viewHolder.path.setText("fadf");
         viewHolder.thumbnail.setImageBitmap(videoData.getThumbnail());
 
         return convertView;

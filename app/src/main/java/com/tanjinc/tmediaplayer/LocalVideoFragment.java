@@ -1,11 +1,10 @@
 package com.tanjinc.tmediaplayer;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
+import android.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +18,7 @@ import java.util.ArrayList;
 /**
  * Created by tanjincheng on 16/2/20.
  */
-public class LocalVideoFragment extends ListFragment {
+public class LocalVideoFragment extends ListFragment implements IVideoProviderUI{
 
     private LocalVideoAdapter mAdapter;
     private VideoProviderAsyncTask mProvider;
@@ -62,9 +61,11 @@ public class LocalVideoFragment extends ListFragment {
     private void startVideoPlayerActivity(Uri uri) {
         Intent intent = new Intent(getActivity(), VideoPlayActivity.class);
         intent.setData(uri);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getActivity().startActivity(intent);
     }
 
+    @Override
     public void setVideoList(ArrayList videoList) {
         mVideoList = videoList;
         mAdapter.setVideoList(mVideoList);

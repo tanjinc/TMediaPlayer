@@ -7,7 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
-import android.support.v4.app.ListFragment;
+//import android.support.v4.app.ListFragment;
 import android.widget.ProgressBar;
 
 import java.util.ArrayList;
@@ -19,9 +19,9 @@ public class VideoProviderAsyncTask extends AsyncTask<VideoData, VideoData, Arra
 
     private Context mContext;
     private ArrayList<VideoData> mVideoList = new ArrayList<>();
-    private LocalVideoFragment mFragment;
+    private IVideoProviderUI mFragment;
 
-    VideoProviderAsyncTask(Context context, LocalVideoFragment fragment) {
+    public VideoProviderAsyncTask(Context context, IVideoProviderUI fragment) {
         mContext = context;
         mFragment = fragment;
     }

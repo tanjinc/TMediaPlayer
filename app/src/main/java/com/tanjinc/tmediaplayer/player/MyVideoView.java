@@ -4,7 +4,9 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.media.MediaMetadata;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.MediaController;
@@ -14,7 +16,7 @@ import java.io.IOException;
 /**
  * Created by tanjinc on 16-2-22.
  */
-public class MyVideoView extends SurfaceView implements MediaController.MediaPlayerControl{
+public class MyVideoView extends SurfaceView implements IVideoView{
 
 
     // all possible internal states
@@ -25,6 +27,7 @@ public class MyVideoView extends SurfaceView implements MediaController.MediaPla
     private static final int STATE_PLAYING = 3;
     private static final int STATE_PAUSED             = 4;
     private static final int STATE_PLAYBACK_COMPLETED = 5;
+    private static final String TAG = "MyVideoView";
 
     // mCurrentState is a VideoView object's current state.
     // mTargetState is the state that a method caller intends to reach.
@@ -59,6 +62,7 @@ public class MyVideoView extends SurfaceView implements MediaController.MediaPla
 
 
     private void initVideoView() {
+        Log.d(TAG, "video initVideoView() called with: " + "");
         mVideoHeight = 0;
         mVideoWidth = 0;
         getHolder().addCallback(mSHCallback);
@@ -93,18 +97,7 @@ public class MyVideoView extends SurfaceView implements MediaController.MediaPla
     };
 
 
-
-    public void setVideoPath(String path){
-        setVideoURI(Uri.parse(path));
-    }
-
-    public void setVideoURI(Uri uri) {
-        mUri = uri;
-        openVideo();
-        requestLayout();
-        invalidate();
-    }
-
+    @Override
     public void start() {
         if (isInPlaybackState()) {
             mMediaPlayer.start();
@@ -114,28 +107,34 @@ public class MyVideoView extends SurfaceView implements MediaController.MediaPla
     }
 
     @Override
-    public void pause() {
+    public void release() {
+        mMediaPlayer.release();
+        mTargetState = STATE_IDLE;
+    }
 
+    @Override
+    public void pause() {
+        mMediaPlayer.pause();
     }
 
     @Override
     public int getDuration() {
-        return 0;
+        return mMediaPlayer != null && (isInPlaybackState())? mMediaPlayer.getDuration() : 0;
     }
 
     @Override
     public int getCurrentPosition() {
-        return 0;
+        return mMediaPlayer != null && (isInPlaybackState())? mMediaPlayer.getCurrentPosition() : 0;
     }
 
     @Override
     public void seekTo(int pos) {
-
+        mMediaPlayer.seekTo(pos);
     }
 
     @Override
     public boolean isPlaying() {
-        return false;
+        return (isInPlaybackState()) && mMediaPlayer.isPlaying();
     }
 
     @Override
@@ -163,6 +162,66 @@ public class MyVideoView extends SurfaceView implements MediaController.MediaPla
         return 0;
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int width = getDefaultSize(mVideoWidth, widthMeasureSpec);
+        int height = getDefaultSize(mVideoHeight, heightMeasureSpec);
+
+        if (mVideoHeight > 0 && mVideoWidth > 0) {
+            int widthSpecMode = MeasureSpec.getMode(widthMeasureSpec);
+            int widthSpecSize = MeasureSpec.getSize(widthMeasureSpec);
+            int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
+            int heightSpecSize = MeasureSpec.getSize(heightMeasureSpec);
+            if (widthSpecMode == MeasureSpec.EXACTLY && heightSpecMode == MeasureSpec.EXACTLY) {
+                width = widthSpecSize;
+                height = heightSpecSize;
+                // mVideoWidth/mVideoHeight  > width/height
+                if (mVideoWidth * height > mVideoHeight * width) {
+                    //too wide
+                    height = mVideoHeight * width / mVideoWidth;
+
+                } else if (mVideoWidth * height < mVideoHeight * width){
+                    //too tall
+                    width = mVideoWidth * height / mVideoHeight;
+                }
+
+            } else if (widthSpecMode == MeasureSpec.EXACTLY) {
+                // only the width is fixed, adjust the height to match aspect ratio if possible
+                width = widthSpecSize;
+                height = width * mVideoHeight / mVideoWidth;
+                if (heightSpecMode == MeasureSpec.AT_MOST && height > heightSpecSize) {
+                    // couldn't match aspect ratio within the constraints
+                    height = heightSpecSize;
+                }
+            } else if (heightSpecMode == MeasureSpec.EXACTLY) {
+                // only the height is fixed, adjust the width to match aspect ratio if possible
+                height = heightSpecSize;
+                width = height * mVideoWidth / mVideoHeight;
+                if (widthSpecMode == MeasureSpec.AT_MOST && width > widthSpecSize) {
+                    // couldn't match aspect ratio within the constraints
+                    width = widthSpecSize;
+                }
+            } else {
+                // neither the width nor the height are fixed, try to use actual video size
+                width = mVideoWidth;
+                height = mVideoHeight;
+                if (heightSpecMode == MeasureSpec.AT_MOST && height > heightSpecSize) {
+                    // too tall, decrease both width and height
+                    height = heightSpecSize;
+                    width = height * mVideoWidth / mVideoHeight;
+                }
+                if (widthSpecMode == MeasureSpec.AT_MOST && width > widthSpecSize) {
+                    // too wide, decrease both width and height
+                    width = widthSpecSize;
+                    height = width * mVideoHeight / mVideoWidth;
+                }
+            }
+
+        } else {
+
+        }
+        setMeasuredDimension(width, height);
+    }
 
     private boolean isInPlaybackState() {
         return (mMediaPlayer != null &&
@@ -206,8 +265,19 @@ public class MyVideoView extends SurfaceView implements MediaController.MediaPla
             if (mTargetState == STATE_PLAYING) {
                 start();
             }
-
         }
     };
 
+    @Override
+    public void setUri(Uri uri) {
+        mUri = uri;
+        openVideo();
+        requestLayout();
+        invalidate();
+    }
+    @Override
+    public String getTitle() {
+        String path = Uri.decode(mUri.getPath());
+        return path != null ? path.substring(TextUtils.lastIndexOf(path, '/') + 1) : "";
+    }
 }
