@@ -7,6 +7,15 @@ import android.net.Uri;
  * 类似 MediaController接口
  */
 public interface IVideoView {
+
+    public interface CompleteListener {
+        void onCompletion();
+    }
+
+    interface ErrorListener {
+        boolean onError(int errNo, String msg);
+    }
+
     void    start();
     void    pause();
     int     getDuration();
@@ -18,6 +27,8 @@ public interface IVideoView {
     boolean canSeekBackward();
     boolean canSeekForward();
     int     getAudioSessionId();
+    public void setCompletelistener(CompleteListener listener);
+    public void setErrorListener(ErrorListener errorListener);
     public void release();
     public void setUri(Uri uri);
     public String getTitle();

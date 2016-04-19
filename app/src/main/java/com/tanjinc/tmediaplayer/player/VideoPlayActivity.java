@@ -66,11 +66,6 @@ public class VideoPlayActivity extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         Log.d(TAG, "video onKeyDown() called with: " + "keyCode = [" + keyCode + "], event = [" + event + "]");
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            finish();
-            return true;
-        } else {
-            return mPlayer != null && mPlayer.onKeyDown(keyCode, event);
-        }
+        return mPlayer != null && mPlayer.onKeyDown(keyCode, event);
     }
 }

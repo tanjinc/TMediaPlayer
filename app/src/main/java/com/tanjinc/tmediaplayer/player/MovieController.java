@@ -2,9 +2,11 @@ package com.tanjinc.tmediaplayer.player;
 
 import android.content.Context;
 import android.os.Handler;
+import android.os.Message;
 import android.support.v4.util.TimeUtils;
 import android.text.format.DateUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,6 +18,8 @@ import android.widget.TextView;
 
 import com.tanjinc.tmediaplayer.R;
 
+import java.lang.ref.WeakReference;
+
 
 /**
  * Created by tanjincheng on 16/3/30.
@@ -23,6 +27,7 @@ import com.tanjinc.tmediaplayer.R;
 public class MovieController extends RelativeLayout implements IController{
 
     private static final int SEEK_BAR_MAX = 10000;
+    private static final String TAG = "MovieController";
     private Context mContext;
     private View mTopPart;
     private View mBottomPart;
@@ -102,6 +107,7 @@ public class MovieController extends RelativeLayout implements IController{
         }
     };
 
+
     private Handler mHandler = new Handler();
     private Runnable progressRunnable = new Runnable() {
         @Override
@@ -115,6 +121,7 @@ public class MovieController extends RelativeLayout implements IController{
                 if (duration != 0) {
                     mSeekBar.setProgress((int) (currenttime * SEEK_BAR_MAX / duration));
                 }
+                Log.d(TAG, "Buffer:" + mPlayer.getBufferPercentage());
                 mHandler.removeCallbacks(progressRunnable);
                 mHandler.postDelayed(progressRunnable, 1000);
             }

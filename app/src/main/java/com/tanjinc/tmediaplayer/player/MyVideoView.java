@@ -48,6 +48,8 @@ public class MyVideoView extends SurfaceView implements IVideoView{
     private int mSurfaceWidth;
     private int mVideoHeight;
     private int mVideoWidth;
+    private CompleteListener mCompleteListener;
+    private ErrorListener mErrorLst;
 
     public MyVideoView(Context context) {
         super(context);
@@ -163,6 +165,16 @@ public class MyVideoView extends SurfaceView implements IVideoView{
     }
 
     @Override
+    public void setCompletelistener(CompleteListener listener) {
+        mCompleteListener = listener;
+    }
+
+    @Override
+    public void setErrorListener(ErrorListener errorListener) {
+        mErrorLst = errorListener;
+    }
+
+    @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int width = getDefaultSize(mVideoWidth, widthMeasureSpec);
         int height = getDefaultSize(mVideoHeight, heightMeasureSpec);
@@ -268,6 +280,25 @@ public class MyVideoView extends SurfaceView implements IVideoView{
         }
     };
 
+
+    private MediaPlayer.OnCompletionListener mOncompletionListener = new MediaPlayer.OnCompletionListener() {
+        @Override
+        public void onCompletion(MediaPlayer mp) {
+            if (mCompleteListener != null) {
+                mCompleteListener.onCompletion();
+            }
+        }
+    };
+
+    private MediaPlayer.OnErrorListener onErrorListener = new MediaPlayer.OnErrorListener() {
+        @Override
+        public boolean onError(MediaPlayer mp, int what, int extra) {
+            if (mErrorLst != null) {
+                mErrorLst.onError(what, "error");
+            }
+            return false;
+        }
+    };
     @Override
     public void setUri(Uri uri) {
         mUri = uri;
