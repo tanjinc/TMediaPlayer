@@ -35,7 +35,9 @@ public class LeftMenuAdapter extends BaseAdapter {
     private ArrayList<MenuItem> mList = new ArrayList<>(Arrays.asList(
             new MenuItem("seting"),
             new MenuItem("hehe"),
-            new MenuItem()
+            new MenuItem(),
+            new MenuItem("ExoPlayer"),
+            new MenuItem("DefPlayer")
 
     ));
 

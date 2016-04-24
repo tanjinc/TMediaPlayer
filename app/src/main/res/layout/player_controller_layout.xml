@@ -56,6 +56,21 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
 
+        <Button
+            android:id="@+id/player_menu_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"/>
+
     </RelativeLayout>
+
+    <!--<com.tanjinc.tmediaplayer.widgets.PlayerMenuWidget-->
+        <!--android:id="@+id/menu_widget"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:background="#ff7777"-->
+        <!--android:layout_alignParentBottom="true">-->
+
+    <!--</com.tanjinc.tmediaplayer.widgets.PlayerMenuWidget>-->
 
 </RelativeLayout>

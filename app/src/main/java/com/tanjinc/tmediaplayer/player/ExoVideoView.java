@@ -1,6 +1,7 @@
 package com.tanjinc.tmediaplayer.player;
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.media.MediaCodec;
 import android.net.Uri;
 import android.os.Handler;
@@ -11,19 +12,39 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.google.android.exoplayer.DefaultLoadControl;
 import com.google.android.exoplayer.ExoPlaybackException;
 import com.google.android.exoplayer.ExoPlayer;
 import com.google.android.exoplayer.FrameworkSampleSource;
+import com.google.android.exoplayer.LoadControl;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
 import com.google.android.exoplayer.MediaCodecSelector;
 import com.google.android.exoplayer.MediaCodecTrackRenderer;
 import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
 import com.google.android.exoplayer.SampleSource;
+import com.google.android.exoplayer.TrackRenderer;
+import com.google.android.exoplayer.audio.AudioCapabilities;
+import com.google.android.exoplayer.audio.AudioTrack;
+import com.google.android.exoplayer.chunk.ChunkSampleSource;
+import com.google.android.exoplayer.chunk.ChunkSource;
+import com.google.android.exoplayer.chunk.FormatEvaluator;
+import com.google.android.exoplayer.dash.DashChunkSource;
+import com.google.android.exoplayer.dash.DefaultDashTrackSelector;
+import com.google.android.exoplayer.dash.mpd.AdaptationSet;
+import com.google.android.exoplayer.dash.mpd.MediaPresentationDescription;
+import com.google.android.exoplayer.dash.mpd.MediaPresentationDescriptionParser;
+import com.google.android.exoplayer.dash.mpd.Period;
+import com.google.android.exoplayer.drm.StreamingDrmSessionManager;
+import com.google.android.exoplayer.drm.UnsupportedDrmException;
 import com.google.android.exoplayer.extractor.ExtractorSampleSource;
+import com.google.android.exoplayer.text.TextTrackRenderer;
 import com.google.android.exoplayer.upstream.Allocator;
 import com.google.android.exoplayer.upstream.DataSource;
 import com.google.android.exoplayer.upstream.DefaultAllocator;
+import com.google.android.exoplayer.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer.upstream.DefaultUriDataSource;
+import com.google.android.exoplayer.upstream.UriDataSource;
+import com.google.android.exoplayer.util.ManifestFetcher;
 import com.google.android.exoplayer.util.Util;
 
 import java.lang.ref.WeakReference;
@@ -34,7 +55,7 @@ import javax.security.auth.login.LoginException;
  * Created by tanjincheng on 16/4/15.
  */
 public class ExoVideoView extends SurfaceView implements IVideoView, SurfaceHolder.Callback,
-        ExoPlayer.Listener, MediaCodecVideoTrackRenderer.EventListener{
+        ExoPlayer.Listener, MediaCodecVideoTrackRenderer.EventListener, MediaCodecAudioTrackRenderer.EventListener{
     private static final String TAG = "ExoVideoView";
 
     private ExoPlayer mExoPlayer;
@@ -43,32 +64,58 @@ public class ExoVideoView extends SurfaceView implements IVideoView, SurfaceHold
 
     private SurfaceHolder mSFHolder;
 
-    private static final int BUFFER_SEGMENT_SIZE = 64 * 1024;
     private static final int BUFFER_SEGMENT_COUNT = 265;
+
+    private static final int BUFFER_SEGMENT_SIZE = 64 * 1024;
+    private static final int VIDEO_BUFFER_SEGMENTS = 200;
+    private static final int AUDIO_BUFFER_SEGMENTS = 54;
+    private static final int TEXT_BUFFER_SEGMENTS = 2;
+    private static final int LIVE_EDGE_LATENCY_MS = 30000;
 
     private Context context;
     private Uri mUri;
     private int mVideoWidth;
     private int mVideoHeight;
+    private int mSurfaceWidth;
+    private int mSurfaceHeight;
+
+    private VideoUtils.PlayState mCurrentState = VideoUtils.PlayState.STATE_IDLE;
+    private VideoUtils.PlayState mTargetState = VideoUtils.PlayState.STATE_IDLE;
 
     // listener
     private CompleteListener mCompleteLst;
     private ErrorListener mErrorLst;
     private Handler mHandler;
+    private String userAgent ;//= Util.getUserAgent(context, "ExoPlayerDemo");
+
+    private  ManifestFetcher<MediaPresentationDescription> manifestFetcher;
+
 
     public ExoVideoView(Context context, Handler mainLooper) {
         super(context);
         this.context = context;
         mHandler = mainLooper;
+        userAgent = Util.getUserAgent(context, "ExoPlayerDemo");
         mSFHolder = getHolder();
     }
 
 
+    public void onRenderers(MediaCodecVideoTrackRenderer videoTrackRenderer, MediaCodecAudioTrackRenderer audioTrackRenderer) {
+        mVideoTrackRenderer = videoTrackRenderer;
+        mAudioTrackRenderer = audioTrackRenderer;
+        mExoPlayer.prepare(mVideoTrackRenderer, mAudioTrackRenderer);
+        mExoPlayer.sendMessage(mVideoTrackRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, mSFHolder.getSurface());
+
+    }
+
+    public Handler getMainHandler() {
+        return mHandler;
+    }
 
     private void initView(Uri uri) {
         mExoPlayer = ExoPlayer.Factory.newInstance(2);
 
-        String userAgent = Util.getUserAgent(context, "ExoPlayerDemo");
+
         Allocator allocator = new DefaultAllocator(BUFFER_SEGMENT_SIZE);
         DataSource dataSource = new DefaultUriDataSource(context, null, userAgent);
 
@@ -82,19 +129,67 @@ public class ExoVideoView extends SurfaceView implements IVideoView, SurfaceHold
                 MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT, 0, mHandler, this, 100);
         mAudioTrackRenderer = new MediaCodecAudioTrackRenderer(
                 sampleSource, MediaCodecSelector.DEFAULT);
+
         mExoPlayer.prepare(mVideoTrackRenderer, mAudioTrackRenderer);
         mExoPlayer.sendMessage(mVideoTrackRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, mSFHolder.getSurface());
 
+        DashRendererBuilder dashRendererBuilder = new DashRendererBuilder(context, userAgent, uri.getPath());
+        dashRendererBuilder.buildRenderers(this);
         mExoPlayer.addListener(this);
+        mExoPlayer.setPlayWhenReady(true);
+    }
+
+    private void buildRenderers() {
+        LoadControl loadControl = new DefaultLoadControl(new DefaultAllocator(BUFFER_SEGMENT_SIZE));
+        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+
+        MediaPresentationDescriptionParser parser = new MediaPresentationDescriptionParser();
+        UriDataSource manifestDataSource = new DefaultUriDataSource(context, userAgent);
+        manifestFetcher = new ManifestFetcher<>(mUri.getPath(), manifestDataSource, parser);
+
+        // Build the video renderer.
+        DataSource videoDataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
+        ChunkSource videoChunkSource = new DashChunkSource(manifestFetcher,
+                DefaultDashTrackSelector.newVideoInstance(context, true, false), videoDataSource,
+                new FormatEvaluator.AdaptiveEvaluator(bandwidthMeter), LIVE_EDGE_LATENCY_MS, 100, null, null,
+                0);
+        ChunkSampleSource videoSampleSource = new ChunkSampleSource(videoChunkSource, loadControl,
+                VIDEO_BUFFER_SEGMENTS * BUFFER_SEGMENT_SIZE);
+        mVideoTrackRenderer = new MediaCodecVideoTrackRenderer(context,
+                videoSampleSource, MediaCodecSelector.DEFAULT,
+                MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT);
+
+        // Build the audio renderer.
+        DataSource audioDataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
+        ChunkSource audioChunkSource = new DashChunkSource(manifestFetcher,
+                DefaultDashTrackSelector.newAudioInstance(), audioDataSource, null, LIVE_EDGE_LATENCY_MS,
+                0, null, null, 1);
+        ChunkSampleSource audioSampleSource = new ChunkSampleSource(audioChunkSource,
+                loadControl, AUDIO_BUFFER_SEGMENTS * BUFFER_SEGMENT_SIZE);
+        mAudioTrackRenderer = new MediaCodecAudioTrackRenderer(
+                audioSampleSource, MediaCodecSelector.DEFAULT);
+    }
+
+    private boolean isInPlaybackState() {
+        return (mExoPlayer != null &&
+                mCurrentState != VideoUtils.PlayState.STATE_ERROR &&
+                mCurrentState != VideoUtils.PlayState.STATE_IDLE &&
+                mCurrentState != VideoUtils.PlayState.STATE_PREPARING);
     }
 
     @Override
     public void start() {
-        mExoPlayer.setPlayWhenReady(true);
+        if (isInPlaybackState()) {
+            Log.d(TAG, "video start()");
+            mExoPlayer.setPlayWhenReady(true);
+            mCurrentState = VideoUtils.PlayState.STATE_PLAYING;
+        }
+        mTargetState = VideoUtils.PlayState.STATE_PLAYING;
     }
 
     @Override
     public void release() {
+        Log.d(TAG, "video release()");
         mExoPlayer.release();
     }
 
@@ -162,12 +257,16 @@ public class ExoVideoView extends SurfaceView implements IVideoView, SurfaceHold
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         mSFHolder = holder;
-        start();
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         Log.d(TAG, "video surfaceChanged() called with: " + "holder = [" + holder + "], format = [" + format + "], width = [" + width + "], height = [" + height + "]");
+        mSurfaceHeight = height;
+        mSurfaceWidth = width;
+        if (mVideoHeight == mSurfaceHeight && mVideoWidth == mSurfaceWidth) {
+            start();
+        }
     }
 
     @Override
@@ -252,6 +351,10 @@ public class ExoVideoView extends SurfaceView implements IVideoView, SurfaceHold
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
         Log.d(TAG, "video onPlayerStateChanged() called with: " + "playWhenReady = [" + playWhenReady + "], playbackState = [" + playbackState + "]");
+
+        if (playbackState == ExoPlayer.STATE_READY) {
+            start();
+        }
         if (playbackState == ExoPlayer.STATE_ENDED) {
             if (mCompleteLst != null) {
                 mCompleteLst.onCompletion();
@@ -281,8 +384,9 @@ public class ExoVideoView extends SurfaceView implements IVideoView, SurfaceHold
         Log.d(TAG, "video onVideoSizeChanged: width:" + width + " height:" + height );
         mVideoWidth = width;
         mVideoHeight = height;
-        requestLayout();
-        invalidate();
+        if (mVideoHeight > 0 && mVideoWidth > 0) {
+            getHolder().setFixedSize(mVideoWidth, mVideoHeight);
+        }
     }
 
     @Override
@@ -302,6 +406,21 @@ public class ExoVideoView extends SurfaceView implements IVideoView, SurfaceHold
 
     @Override
     public void onDecoderInitialized(String decoderName, long elapsedRealtimeMs, long initializationDurationMs) {
+
+    }
+
+    @Override
+    public void onAudioTrackInitializationError(AudioTrack.InitializationException e) {
+
+    }
+
+    @Override
+    public void onAudioTrackWriteError(AudioTrack.WriteException e) {
+
+    }
+
+    @Override
+    public void onAudioTrackUnderrun(int bufferSize, long bufferSizeMs, long elapsedSinceLastFeedMs) {
 
     }
 }

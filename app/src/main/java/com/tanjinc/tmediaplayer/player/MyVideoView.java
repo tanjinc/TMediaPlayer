@@ -9,9 +9,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.MediaController;
-
-import java.io.IOException;
 
 /**
  * Created by tanjinc on 16-2-22.
@@ -20,23 +17,12 @@ public class MyVideoView extends SurfaceView implements IVideoView{
 
 
     // all possible internal states
-    private static final int STATE_ERROR              = -1;
-    private static final int STATE_IDLE               = 0;
-    private static final int STATE_PREPARING          = 1;
-    private static final int STATE_PREPARED           = 2;
-    private static final int STATE_PLAYING = 3;
-    private static final int STATE_PAUSED             = 4;
-    private static final int STATE_PLAYBACK_COMPLETED = 5;
+
     private static final String TAG = "MyVideoView";
 
-    // mCurrentState is a VideoView object's current state.
-    // mTargetState is the state that a method caller intends to reach.
-    // For instance, regardless the VideoView object's current state,
-    // calling pause() intends to bring the object to a target state
-    // of STATE_PAUSED.
 
-    private int mCurrentState = STATE_IDLE;     //当前VideoView的状态
-    private int mTargetState = STATE_IDLE;      //将要前往的状态
+    private VideoUtils.PlayState mCurrentState = VideoUtils.PlayState.STATE_IDLE;
+    private VideoUtils.PlayState mTargetState = VideoUtils.PlayState.STATE_IDLE;      //将要前往的状态
 
     private Uri mUri;
     private Context mContext;
@@ -76,42 +62,50 @@ public class MyVideoView extends SurfaceView implements IVideoView{
     private SurfaceHolder.Callback mSHCallback = new SurfaceHolder.Callback() {
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
+            Log.d(TAG, "video surfaceCreated()");
             mSFHolder = holder;
             openVideo();
         }
 
         @Override
         public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-            mVideoHeight = height;
-            mVideoWidth = width;
-            boolean isValidState = (mTargetState == STATE_PLAYING);
-            boolean isValidSize = (mVideoHeight == height && mVideoWidth == width);
-            if (mMediaPlayer != null && isValidSize && isValidState) {
-                mMediaPlayer.start();
+            Log.d(TAG, "video surfaceChanged() called with: " +" format = [" + format + "], width = [" + width + "], height = [" + height + "]");
+            mSurfaceHeight = height;
+            mSurfaceWidth = width;
+            boolean isValidState = (mTargetState == VideoUtils.PlayState.STATE_PLAYING);
+            boolean isValidSize = (mSurfaceHeight == mVideoHeight && mSurfaceWidth == mVideoWidth);
+            if (isValidSize && isValidState) {
+                start();
             }
         }
 
         @Override
         public void surfaceDestroyed(SurfaceHolder holder) {
             mSFHolder = null;
-            release(true);
+            release();
         }
     };
 
 
     @Override
     public void start() {
+        Log.d(TAG, "video start()");
         if (isInPlaybackState()) {
             mMediaPlayer.start();
-            mCurrentState = STATE_PLAYING;
+            mCurrentState = VideoUtils.PlayState.STATE_PLAYING;
         }
-        mTargetState = STATE_PLAYING;
+        mTargetState = VideoUtils.PlayState.STATE_PLAYING;
     }
 
     @Override
     public void release() {
-        mMediaPlayer.release();
-        mTargetState = STATE_IDLE;
+        if (mMediaPlayer != null) {
+            Log.d(TAG, "video release()");
+            mMediaPlayer.reset();
+            mMediaPlayer.release();
+            mMediaPlayer = null;
+            mTargetState = VideoUtils.PlayState.STATE_IDLE;
+        }
     }
 
     @Override
@@ -237,45 +231,48 @@ public class MyVideoView extends SurfaceView implements IVideoView{
 
     private boolean isInPlaybackState() {
         return (mMediaPlayer != null &&
-                mCurrentState != STATE_ERROR &&
-                mCurrentState != STATE_IDLE &&
-                mCurrentState != STATE_PREPARING);
+                mCurrentState != VideoUtils.PlayState.STATE_ERROR &&
+                mCurrentState != VideoUtils.PlayState.STATE_IDLE &&
+                mCurrentState != VideoUtils.PlayState.STATE_PREPARING);
     }
 
     private void openVideo() {
         if (mUri == null || mSFHolder == null) {
             return;
         }
-        release(true);
+        Log.d(TAG, "video openVideo()");
+        release();
         mMediaPlayer = new MediaPlayer();
         try {
             mMediaPlayer.setOnPreparedListener(mOnPrepareListener);
             mMediaPlayer.setDisplay(mSFHolder);
             mMediaPlayer.setDataSource(mUri.getPath());
             mMediaPlayer.prepareAsync();
-            mCurrentState = STATE_PREPARING;
+            mCurrentState = VideoUtils.PlayState.STATE_PREPARING;
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
 
-    private void release(boolean cleartargetstate) {
-        if (mMediaPlayer != null) {
-            mMediaPlayer.reset();
-            mMediaPlayer.release();
-            mMediaPlayer = null;
-        }
-    }
 
     private MediaPlayer.OnPreparedListener mOnPrepareListener = new MediaPlayer.OnPreparedListener() {
         @Override
         public void onPrepared(MediaPlayer mp) {
             mVideoWidth = mp.getVideoWidth();
             mVideoHeight = mp.getVideoHeight();
-            mCurrentState = STATE_PREPARED;
-            if (mTargetState == STATE_PLAYING) {
-                start();
+            Log.d(TAG, "video onPrepared()" +"videoWidth:" + mVideoWidth + " videoHeight:" + mVideoHeight + "target" + mTargetState);
+            mCurrentState = VideoUtils.PlayState.STATE_PREPARED;
+//            if (mTargetState == VideoUtils.PlayState.STATE_PLAYING) {
+//                start();
+//            }
+            if (mVideoWidth > 0 && mVideoHeight > 0) {
+                getHolder().setFixedSize(mVideoWidth, mVideoHeight);
+                if (mSurfaceHeight == mVideoHeight
+                        && mSurfaceWidth == mVideoWidth
+                        && mTargetState == VideoUtils.PlayState.STATE_PLAYING) {
+                    start();
+                }
             }
         }
     };

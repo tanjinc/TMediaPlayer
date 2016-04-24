@@ -1,6 +1,7 @@
 package com.tanjinc.tmediaplayer.player;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.util.TimeUtils;
@@ -10,6 +11,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.MediaController;
 import android.widget.RelativeLayout;
@@ -17,8 +21,11 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.tanjinc.tmediaplayer.R;
+import com.tanjinc.tmediaplayer.widgets.PlayerMenuAdapter;
+import com.tanjinc.tmediaplayer.widgets.PlayerMenuWidget;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 
 /**
@@ -35,10 +42,15 @@ public class MovieController extends RelativeLayout implements IController{
     private IVideoView mPlayer;
 
     private ImageButton mPlayBtn;
+    private Button mMenuBtn;
     private SeekBar mSeekBar;
     private TextView mCurrentTimeTv;
     private TextView mDurationTv;
     private TextView mTitleTv;
+
+    private boolean mIsHorizontal;
+    //widget
+    private PlayerMenuWidget mPlayerMenuWidget;
 
     private enum PlayState {
 
@@ -59,6 +71,8 @@ public class MovieController extends RelativeLayout implements IController{
 
     private void init() {
         LayoutInflater.from(mContext).inflate(R.layout.player_controller_layout, this);
+
+        mIsHorizontal = mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
 
         mTopPart = findViewById(R.id.top_layout);
         mBottomPart = findViewById(R.id.bottom_layout);
@@ -85,6 +99,45 @@ public class MovieController extends RelativeLayout implements IController{
                 }
             }
         });
+
+        mMenuBtn = (Button) findViewById(R.id.player_menu_btn);
+        mMenuBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mPlayerMenuWidget.isShown()) {
+                    mPlayerMenuWidget.hideWithAnim(true);
+                } else {
+                    mPlayerMenuWidget.showWithAnim(true);
+                }
+            }
+        });
+
+        addWidgets();
+        resetLayout();
+    }
+
+    private void addWidgets() {
+        mPlayerMenuWidget = new PlayerMenuWidget(mContext);
+        addView(mPlayerMenuWidget);
+
+        ArrayList<PlayerMenuWidget.PlayerMenuData> menuData = new ArrayList<PlayerMenuWidget.PlayerMenuData>();
+        menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_PLAY, "播放"));
+        menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_PLAY,false,"单个循环"));
+        menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_PLAY,false,"连续播放"));
+        menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_SCREEN,"窗口大小"));
+        menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_SCREEN,true,"屏幕适应"));
+        menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_SCREEN,false, "全屏"));
+        menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_SCREEN,false,"原尺寸"));
+        menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_DNLA, "DLNA"));
+        menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_DNLA, false, "codi"));
+        menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_DNLA, false, "xbmc"));
+        menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_DNLA, false, "xiaomi"));
+        mPlayerMenuWidget.setMenuData(menuData);
+        mPlayerMenuWidget.hideWithAnim(false);
+    }
+
+    private void resetLayout() {
+        mPlayerMenuWidget.resetLayout(mIsHorizontal);
     }
 
     private SeekBar.OnSeekBarChangeListener mSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
@@ -121,7 +174,6 @@ public class MovieController extends RelativeLayout implements IController{
                 if (duration != 0) {
                     mSeekBar.setProgress((int) (currenttime * SEEK_BAR_MAX / duration));
                 }
-                Log.d(TAG, "Buffer:" + mPlayer.getBufferPercentage());
                 mHandler.removeCallbacks(progressRunnable);
                 mHandler.postDelayed(progressRunnable, 1000);
             }
@@ -174,11 +226,22 @@ public class MovieController extends RelativeLayout implements IController{
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (mPlayerMenuWidget.isShown()) {
+            mPlayerMenuWidget.hideWithAnim(true);
+            return false;
+        }
         if(mIsShowing) {
             hideController();
         } else {
             showController();
         }
         return super.onTouchEvent(event);
+    }
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        mIsHorizontal = newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE;
+        resetLayout();
+        super.onConfigurationChanged(newConfig);
     }
 }

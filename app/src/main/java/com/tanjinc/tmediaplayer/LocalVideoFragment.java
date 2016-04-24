@@ -68,9 +68,17 @@ public class LocalVideoFragment extends ListFragment implements IVideoProviderUI
     @Override
     public void setVideoList(ArrayList videoList) {
         mVideoList = videoList;
+        addTest();
         mAdapter.setVideoList(mVideoList);
     }
 
+    private void addTest() {
+        VideoData testData = new VideoData();
+        testData.setName("test");
+        String video = "https://r12---sn-a5m7ln76.c.youtube.com/videoplayback?id=bf5bb2419360daf1&itag=135&source=youtube&requiressl=yes&ratebypass=yes&mime=video/mp4&gir=yes&clen=15973445&lmt=1434104793587130&dur=135.502&signature=5A8E9D4CD81ECBDA6669958AC5765298F75B007D.43FE2EA2EEF80A6B188F64092158C11EB770EBAF&key=cms1&ip=45.78.17.131&ipbits=0&expire=2147483647&sparams=clen,dur,expire,gir,id,ip,ipbits,itag,lmt,mime,mm,mn,ms,mv,nh,pl,ratebypass,requiressl,source&mm=30&mn=sn-a5m7ln76&ms=nxu&mt=1461213226&mv=u&nh=IgpwcjAyLmxheDAyKgkxMjcuMC4wLjE&pl=24";
+        testData.setPath(video);
+        mVideoList.add(0, testData);
+    }
     @Override
     public void onDestroyView() {
         super.onDestroyView();

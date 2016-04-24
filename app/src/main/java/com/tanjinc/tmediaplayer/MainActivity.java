@@ -2,6 +2,8 @@ package com.tanjinc.tmediaplayer;
 
 import android.Manifest;
 import android.app.FragmentManager;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Build;
@@ -13,10 +15,14 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ListView;
+
+import com.tanjinc.tmediaplayer.player.VideoUtils;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -30,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private ListView mMenuList;
     private Toolbar mToolbar;
 
+    private Context mContext;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,9 +45,12 @@ public class MainActivity extends AppCompatActivity {
             WindowManager.LayoutParams localLayoutParams = getWindow().getAttributes();
             localLayoutParams.flags = (WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | localLayoutParams.flags);
         }
+        mContext = this;
         android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
 
+        final SharedPreferences sharedPreferences = getSharedPreferences("tanjinc", Context.MODE_PRIVATE);
+        final SharedPreferences.Editor editor = sharedPreferences.edit();
         initToolbar();
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -50,6 +60,16 @@ public class MainActivity extends AppCompatActivity {
         mFrameLayout = (FrameLayout) findViewById(R.id.container);
         mMenuList = (ListView) findViewById(R.id.left_menu);
         mMenuList.setAdapter(new LeftMenuAdapter(this));
+        mMenuList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 3) {
+                    VideoUtils.setPlayerType(mContext,VideoUtils.PLAYER_TYPE_EXO);
+                } else if (position == 4) {
+                    VideoUtils.setPlayerType(mContext,VideoUtils.PLAYER_TYPE_DEF);
+                }
+            }
+        });
 //
         if (savedInstanceState == null) {
             mLocalVideoFragment = new LocalVideoFragment();
