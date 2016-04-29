@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -82,6 +83,7 @@ public class MovieController extends RelativeLayout implements IController{
         mSeekBar = (SeekBar) findViewById(R.id.seekbar);
         mSeekBar.setMax(SEEK_BAR_MAX);
         mSeekBar.setOnSeekBarChangeListener(mSeekBarChangeListener);
+        mSeekBar.setThumb(null);
 
         mCurrentTimeTv = (TextView) findViewById(R.id.currenttime_tv);
         mDurationTv = (TextView) findViewById(R.id.duration_tv);
@@ -92,9 +94,11 @@ public class MovieController extends RelativeLayout implements IController{
             public void onClick(View v) {
                 if (mPlayer.isPlaying()) {
                     mPlayer.pause();
+                    mPlayBtn.setActivated(false);
                     mHandler.removeCallbacks(progressRunnable);
                 } else {
                     mPlayer.start();
+                    mPlayBtn.setActivated(true);
                     mHandler.post(progressRunnable);
                 }
             }
@@ -111,6 +115,7 @@ public class MovieController extends RelativeLayout implements IController{
                 }
             }
         });
+        mMenuBtn.setVisibility(GONE);
 
         addWidgets();
         resetLayout();
@@ -168,11 +173,17 @@ public class MovieController extends RelativeLayout implements IController{
             if (mPlayer != null && mSeekBar != null) {
                 long currenttime = mPlayer.getCurrentPosition();
                 long duration = mPlayer.getDuration();
+                long bufferposition = mPlayer.getBufferedPosition();
+                if (bufferposition < 0 ) {
+                    bufferposition = 0;
+                }
 
                 mCurrentTimeTv.setText(VideoUtils.length2time(currenttime));
                 mDurationTv.setText(VideoUtils.length2time(duration));
                 if (duration != 0) {
                     mSeekBar.setProgress((int) (currenttime * SEEK_BAR_MAX / duration));
+                    mSeekBar.setSecondaryProgress((int) (bufferposition * SEEK_BAR_MAX / duration));
+                    Log.e(TAG, "video current: " +currenttime +" buffer: "+ bufferposition);
                 }
                 mHandler.removeCallbacks(progressRunnable);
                 mHandler.postDelayed(progressRunnable, 1000);
@@ -206,6 +217,7 @@ public class MovieController extends RelativeLayout implements IController{
 
     @Override
     public void start() {
+        mPlayBtn.setActivated(true);
         mHandler.post(progressRunnable);
     }
 

@@ -1,4 +1,4 @@
-package com.tanjinc.tmediaplayer;
+package com.tanjinc.tmediaplayer.data;
 
 import android.graphics.Bitmap;
 import android.widget.ImageView;

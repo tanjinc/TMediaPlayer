@@ -20,6 +20,7 @@ public interface IVideoView {
     void    pause();
     int     getDuration();
     int     getCurrentPosition();
+    long    getBufferedPosition();
     void    seekTo(int pos);
     boolean isPlaying();
     int     getBufferPercentage();

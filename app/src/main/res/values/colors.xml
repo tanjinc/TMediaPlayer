@@ -8,4 +8,7 @@
     <color name="textcolorwhite">#ffffff</color>
     <color name="textcolorwhite_trans">#80ffffff</color><!--50%透明白色-->
     <color name="video_list_divider_color">#26ffffff</color>
+
+    <color name="controller_layout_bg_color">#cc000000</color> <!-- 80透明黑色 -->
+    <color name="text_color">#9fffffff</color>
 </resources>

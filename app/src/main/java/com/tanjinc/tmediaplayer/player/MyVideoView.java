@@ -124,6 +124,11 @@ public class MyVideoView extends SurfaceView implements IVideoView{
     }
 
     @Override
+    public long getBufferedPosition() {
+        return 0;
+    }
+
+    @Override
     public void seekTo(int pos) {
         mMediaPlayer.seekTo(pos);
     }
@@ -246,7 +251,8 @@ public class MyVideoView extends SurfaceView implements IVideoView{
         try {
             mMediaPlayer.setOnPreparedListener(mOnPrepareListener);
             mMediaPlayer.setDisplay(mSFHolder);
-            mMediaPlayer.setDataSource(mUri.getPath());
+            mMediaPlayer.setDataSource(mContext, mUri, null);
+//            mMediaPlayer.setDataSource(mUri.getPath());
             mMediaPlayer.prepareAsync();
             mCurrentState = VideoUtils.PlayState.STATE_PREPARING;
         } catch (Exception e) {

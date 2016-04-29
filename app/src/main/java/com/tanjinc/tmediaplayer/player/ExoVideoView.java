@@ -66,7 +66,7 @@ public class ExoVideoView extends SurfaceView implements IVideoView, SurfaceHold
 
     private static final int BUFFER_SEGMENT_COUNT = 265;
 
-    private static final int BUFFER_SEGMENT_SIZE = 64 * 1024;
+    private static final int BUFFER_SEGMENT_SIZE = 1024 * 1024;
     private static final int VIDEO_BUFFER_SEGMENTS = 200;
     private static final int AUDIO_BUFFER_SEGMENTS = 54;
     private static final int TEXT_BUFFER_SEGMENTS = 2;
@@ -119,12 +119,12 @@ public class ExoVideoView extends SurfaceView implements IVideoView, SurfaceHold
         Allocator allocator = new DefaultAllocator(BUFFER_SEGMENT_SIZE);
         DataSource dataSource = new DefaultUriDataSource(context, null, userAgent);
 
-//        ExtractorSampleSource sampleSource = new ExtractorSampleSource(
-//                uri, dataSource, allocator, BUFFER_SEGMENT_COUNT * BUFFER_SEGMENT_SIZE);
+        ExtractorSampleSource sampleSource = new ExtractorSampleSource(
+                uri, dataSource, allocator, BUFFER_SEGMENT_COUNT * BUFFER_SEGMENT_SIZE);
 
         // 尽管google不建议使用FrameworkSampleSource，但它是使用原生MediaExtracor，能够解析FLV文件。
         // 而google推荐的ExtractorSampleSource 却不能播放FLV，并且也没有计划推出新的Extractor支持flv
-        FrameworkSampleSource sampleSource = new FrameworkSampleSource(context, uri, null);
+//        FrameworkSampleSource sampleSource = new FrameworkSampleSource(context, uri, null);
         mVideoTrackRenderer = new MediaCodecVideoTrackRenderer(context, sampleSource, MediaCodecSelector.DEFAULT,
                 MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT, 0, mHandler, this, 100);
         mAudioTrackRenderer = new MediaCodecAudioTrackRenderer(
@@ -137,37 +137,6 @@ public class ExoVideoView extends SurfaceView implements IVideoView, SurfaceHold
         dashRendererBuilder.buildRenderers(this);
         mExoPlayer.addListener(this);
         mExoPlayer.setPlayWhenReady(true);
-    }
-
-    private void buildRenderers() {
-        LoadControl loadControl = new DefaultLoadControl(new DefaultAllocator(BUFFER_SEGMENT_SIZE));
-        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-
-        MediaPresentationDescriptionParser parser = new MediaPresentationDescriptionParser();
-        UriDataSource manifestDataSource = new DefaultUriDataSource(context, userAgent);
-        manifestFetcher = new ManifestFetcher<>(mUri.getPath(), manifestDataSource, parser);
-
-        // Build the video renderer.
-        DataSource videoDataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
-        ChunkSource videoChunkSource = new DashChunkSource(manifestFetcher,
-                DefaultDashTrackSelector.newVideoInstance(context, true, false), videoDataSource,
-                new FormatEvaluator.AdaptiveEvaluator(bandwidthMeter), LIVE_EDGE_LATENCY_MS, 100, null, null,
-                0);
-        ChunkSampleSource videoSampleSource = new ChunkSampleSource(videoChunkSource, loadControl,
-                VIDEO_BUFFER_SEGMENTS * BUFFER_SEGMENT_SIZE);
-        mVideoTrackRenderer = new MediaCodecVideoTrackRenderer(context,
-                videoSampleSource, MediaCodecSelector.DEFAULT,
-                MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT);
-
-        // Build the audio renderer.
-        DataSource audioDataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
-        ChunkSource audioChunkSource = new DashChunkSource(manifestFetcher,
-                DefaultDashTrackSelector.newAudioInstance(), audioDataSource, null, LIVE_EDGE_LATENCY_MS,
-                0, null, null, 1);
-        ChunkSampleSource audioSampleSource = new ChunkSampleSource(audioChunkSource,
-                loadControl, AUDIO_BUFFER_SEGMENTS * BUFFER_SEGMENT_SIZE);
-        mAudioTrackRenderer = new MediaCodecAudioTrackRenderer(
-                audioSampleSource, MediaCodecSelector.DEFAULT);
     }
 
     private boolean isInPlaybackState() {
@@ -206,6 +175,11 @@ public class ExoVideoView extends SurfaceView implements IVideoView, SurfaceHold
     @Override
     public int getCurrentPosition() {
         return (int) mExoPlayer.getCurrentPosition();
+    }
+
+    @Override
+    public long getBufferedPosition() {
+        return mExoPlayer.getBufferedPosition();
     }
 
     @Override
@@ -370,6 +344,7 @@ public class ExoVideoView extends SurfaceView implements IVideoView, SurfaceHold
     @Override
     public void onPlayerError(ExoPlaybackException error) {
         if (mErrorLst != null) {
+            Log.e(TAG, "video onPlayerError: " + error );
             mErrorLst.onError(0, error.toString());
         }
     }

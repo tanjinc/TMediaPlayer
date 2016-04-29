@@ -22,19 +22,21 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ListView;
 
+import com.tanjinc.tmediaplayer.data.LocalVideoDataSource;
 import com.tanjinc.tmediaplayer.player.VideoUtils;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private FragmentManager mFagmentManager;
-    private Fragment mLocalVideoFragment;
+    private VideoContract.View mLocalVideoFragment;
     private Fragment mMainFragment;
     private HorizontalScrollView scrollView;
     private DrawerLayout mDrawerLayout;
     private FrameLayout mFrameLayout;
     private ListView mMenuList;
     private Toolbar mToolbar;
+    private LocalVideoPresenter mPresenter;
 
     private Context mContext;
     @Override
@@ -71,11 +73,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 //
+        //create view
         if (savedInstanceState == null) {
             mLocalVideoFragment = new LocalVideoFragment();
-            transaction.add(R.id.fragment_container2, mLocalVideoFragment, "video");
+            transaction.add(R.id.fragment_container2, (Fragment) mLocalVideoFragment, "video");
             transaction.commit();
         }
+
+        // create presenter
+        mPresenter = new LocalVideoPresenter(mLocalVideoFragment, new LocalVideoDataSource(mContext));
         getContentResolver();
 
     }

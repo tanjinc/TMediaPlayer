@@ -2,10 +2,14 @@ package com.tanjinc.tmediaplayer.widgets;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.view.animation.PathInterpolatorCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,6 +17,7 @@ import android.text.Layout;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Display;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -23,6 +28,7 @@ import android.widget.RelativeLayout;
 import com.tanjinc.tmediaplayer.LeftMenuAdapter;
 import com.tanjinc.tmediaplayer.R;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 /**
@@ -30,10 +36,12 @@ import java.util.ArrayList;
  */
 public class PlayerMenuWidget extends FrameLayout implements IWidget{
     private static final String TAG = "PlayerMenuWidget";
-
+    private static final int HIDE_AUTO = 1;
+    private static final int HIDE_AUTO_TIME = 5000;
     private Context mContext;
     private RecyclerView mRecyclerView;
     private PlayerMenuAdapter mMenuAdapter;
+    private LinearLayoutManager mLinearLayoutManager;
 
     private int mScreenWidth;
     private int mScreenHeight;
@@ -121,11 +129,14 @@ public class PlayerMenuWidget extends FrameLayout implements IWidget{
                         default:
                             break;
                     }
+                    mHandler.removeMessages(HIDE_AUTO);
+                    mHandler.sendEmptyMessageDelayed(HIDE_AUTO, HIDE_AUTO_TIME);
                 }
             }
         });
         mRecyclerView.setAdapter(mMenuAdapter);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
+        mLinearLayoutManager = new LinearLayoutManager(context);
+        mRecyclerView.setLayoutManager(mLinearLayoutManager);
 
         mRecyclerView.setBackgroundColor(getResources().getColor(R.color.player_menu_widget_bg));
         initWindowSize();
@@ -152,11 +163,24 @@ public class PlayerMenuWidget extends FrameLayout implements IWidget{
         }
     }
 
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case HIDE_AUTO:
+                    hideWithAnim(true);
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
     public void setMenuData(ArrayList<PlayerMenuData> list) {
         mMenuDataArrayList = list;
         mMenuAdapter.setData(mMenuDataArrayList);
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     private void initWindowSize() {
         WindowManager windowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
         Display display = windowManager.getDefaultDisplay();
@@ -168,6 +192,7 @@ public class PlayerMenuWidget extends FrameLayout implements IWidget{
 
     @Override
     public void showWithAnim(boolean hasAnim) {
+        mLinearLayoutManager.scrollToPosition(0);
         if (hasAnim) {
             ObjectAnimator transAnim = null;
             Log.e(TAG, "show ()=" + getTop() +" "+getBottom()+" "+getRight()+ " "+getLeft());
@@ -185,6 +210,8 @@ public class PlayerMenuWidget extends FrameLayout implements IWidget{
         } else {
             setVisibility(VISIBLE);
         }
+        mHandler.removeMessages(HIDE_AUTO);
+        mHandler.sendEmptyMessageDelayed(HIDE_AUTO, HIDE_AUTO_TIME);
     }
 
     @Override
@@ -226,6 +253,7 @@ public class PlayerMenuWidget extends FrameLayout implements IWidget{
         } else {
             setVisibility(INVISIBLE);
         }
+        mHandler.removeMessages(HIDE_AUTO);
     }
 
     @Override
@@ -245,5 +273,10 @@ public class PlayerMenuWidget extends FrameLayout implements IWidget{
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         }
         setLayoutParams(layoutParams);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        return super.dispatchTouchEvent(ev);
     }
 }
