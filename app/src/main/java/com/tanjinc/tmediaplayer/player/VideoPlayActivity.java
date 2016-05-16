@@ -13,13 +13,17 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
+import com.sina.weibo.sdk.api.share.BaseResponse;
+import com.sina.weibo.sdk.api.share.IWeiboHandler;
+import com.sina.weibo.sdk.constant.WBConstants;
 import com.tanjinc.tmediaplayer.R;
 
 /**
  * Created by tanjincheng on 16/2/21.
  */
-public class VideoPlayActivity extends AppCompatActivity {
+public class VideoPlayActivity extends AppCompatActivity implements IWeiboHandler.Response{
     private static final String TAG = "VideoPlayActivity";
 
     private MoviePlayer mPlayer;
@@ -67,5 +71,21 @@ public class VideoPlayActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         Log.d(TAG, "video onKeyDown() called with: " + "keyCode = [" + keyCode + "], event = [" + event + "]");
         return mPlayer != null && mPlayer.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void onResponse(BaseResponse baseResponse) {
+        switch (baseResponse.errCode) {
+            case WBConstants.ErrorCode.ERR_OK:
+                Toast.makeText(this, "Share to Weibo Success！", Toast.LENGTH_LONG).show();
+                break;
+            case WBConstants.ErrorCode.ERR_CANCEL:
+                Toast.makeText(this, "Share is Canceled！", Toast.LENGTH_LONG).show();
+                break;
+            case WBConstants.ErrorCode.ERR_FAIL:
+                Toast.makeText(this, "Share to Weibo Failure！" + "Error Message: " + baseResponse.errMsg,
+                        Toast.LENGTH_LONG).show();
+                break;
+        }
     }
 }

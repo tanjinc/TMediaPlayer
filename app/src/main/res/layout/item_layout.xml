@@ -7,8 +7,8 @@
 
     <ImageView
         android:id="@+id/thumbnail"
-        android:layout_width="100dp"
-        android:layout_height="80dp"
+        android:layout_width="@dimen/video_thumbnail_width"
+        android:layout_height="@dimen/video_thumbnail_height"
         tools:background="#ddd333"/>
     <LinearLayout
         android:orientation="vertical"

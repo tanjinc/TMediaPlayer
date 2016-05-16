@@ -8,6 +8,10 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
 
+import com.sina.weibo.sdk.utils.ImageUtils;
+import com.tanjinc.tmediaplayer.R;
+import com.tanjinc.tmediaplayer.utils.ImageUtil;
+
 import java.util.ArrayList;
 
 /**
@@ -61,16 +65,18 @@ public class LocalVideoDataSource implements VideoRepository{
                     videoData.setName(cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.TITLE)));
                     videoData.setPath(cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATA)));
 
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inDither = false;
-                    options.inPreferredConfig = Bitmap.Config.RGB_565;
-                    int id = cursor.getInt(cursor.getColumnIndex(MediaStore.Video.Media._ID));
-                    Bitmap bitmap = MediaStore.Video.Thumbnails.getThumbnail(contentResolver, id,  MediaStore.Images.Thumbnails.MICRO_KIND, options);
-                    videoData.setThumbnail(bitmap);
+//                    BitmapFactory.Options options = new BitmapFactory.Options();
+//                    options.inDither = false;
+//                    options.inPreferredConfig = Bitmap.Config.RGB_565;
+//                    int id = cursor.getInt(cursor.getColumnIndex(MediaStore.Video.Media._ID));
+//                    Bitmap bitmap = MediaStore.Video.Thumbnails.getThumbnail(contentResolver, id,  MediaStore.Images.Thumbnails.MICRO_KIND, options);
+//                    videoData.setThumbnail(bitmap);
 
-                    publishProgress(videoData);
+                    videoData.thumbPath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Thumbnails.DATA));
+
+
+//                    publishProgress(videoData);
                     mVideoList.add(videoData);
-                    cursor.moveToNext();
                 }
                 cursor.close();
             }

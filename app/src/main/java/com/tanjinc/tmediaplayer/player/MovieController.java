@@ -24,6 +24,7 @@ import android.widget.TextView;
 import com.tanjinc.tmediaplayer.R;
 import com.tanjinc.tmediaplayer.widgets.PlayerMenuAdapter;
 import com.tanjinc.tmediaplayer.widgets.PlayerMenuWidget;
+import com.tanjinc.tmediaplayer.widgets.ShareWidget;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ public class MovieController extends RelativeLayout implements IController{
 
     private ImageButton mPlayBtn;
     private Button mMenuBtn;
+    private Button mShareBtn;
     private SeekBar mSeekBar;
     private TextView mCurrentTimeTv;
     private TextView mDurationTv;
@@ -52,6 +54,7 @@ public class MovieController extends RelativeLayout implements IController{
     private boolean mIsHorizontal;
     //widget
     private PlayerMenuWidget mPlayerMenuWidget;
+    private ShareWidget mShareWidget;
 
     private enum PlayState {
 
@@ -115,7 +118,17 @@ public class MovieController extends RelativeLayout implements IController{
                 }
             }
         });
-        mMenuBtn.setVisibility(GONE);
+        mMenuBtn.setVisibility(VISIBLE);
+
+        //share button
+        mShareBtn = (Button) findViewById(R.id.share_btn);
+        mShareBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mShareWidget.showWithAnim(true);
+            }
+        });
+        mShareBtn.setVisibility(VISIBLE);
 
         addWidgets();
         resetLayout();
@@ -139,6 +152,11 @@ public class MovieController extends RelativeLayout implements IController{
         menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_DNLA, false, "xiaomi"));
         mPlayerMenuWidget.setMenuData(menuData);
         mPlayerMenuWidget.hideWithAnim(false);
+
+
+        mShareWidget = new ShareWidget(mContext);
+        addView(mShareWidget);
+        mShareWidget.resetLayout(mIsHorizontal);
     }
 
     private void resetLayout() {

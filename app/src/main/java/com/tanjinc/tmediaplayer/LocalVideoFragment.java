@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.tanjinc.tmediaplayer.data.VideoData;
 import com.tanjinc.tmediaplayer.player.VideoPlayActivity;
+import com.tanjinc.tmediaplayer.utils.ImageUtil;
 
 import java.util.ArrayList;
 
@@ -64,7 +65,9 @@ public class LocalVideoFragment extends ListFragment implements VideoContract.Vi
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.start();
+        if (mPresenter != null) {
+            mPresenter.start();
+        }
     }
 
     private void startVideoPlayerActivity(Uri uri) {
@@ -116,10 +119,14 @@ public class LocalVideoFragment extends ListFragment implements VideoContract.Vi
         private ArrayList<VideoData> mVideoList;
         private Context mContext;
 
+        private int mHeight;
+        private int mWidth;
 
         public LocalVideoAdapter(Context context, ArrayList<VideoData> videolist) {
             mContext = context;
             mVideoList = videolist;
+            mHeight= (int) mContext.getResources().getDimension(R.dimen.video_thumbnail_height);
+            mWidth = (int) mContext.getResources().getDimension(R.dimen.video_thumbnail_width);
         }
 
         public void setVideoList(ArrayList list) {
@@ -169,7 +176,10 @@ public class LocalVideoFragment extends ListFragment implements VideoContract.Vi
             viewHolder.displayName.setText(videoData.getName());
             viewHolder.path.setText(videoData.getPath());
 //        viewHolder.path.setText("fadf");
-            viewHolder.thumbnail.setImageBitmap(videoData.getThumbnail());
+//            viewHolder.thumbnail.setImageBitmap(videoData.getThumbnail());
+
+
+            ImageUtil.loadLoalImage(mContext, videoData.thumbPath, mHeight, mWidth, viewHolder.thumbnail, 0);
 
             return convertView;
         }

@@ -10,6 +10,7 @@ public class VideoData {
     private String name;
     private String path;
     public Bitmap thumbnail;
+    public String thumbPath;
     private String parentDir;
 
     public String getName() {
