@@ -22,6 +22,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.tanjinc.tmediaplayer.R;
+import com.tanjinc.tmediaplayer.widgets.IWidget;
 import com.tanjinc.tmediaplayer.widgets.PlayerMenuAdapter;
 import com.tanjinc.tmediaplayer.widgets.PlayerMenuWidget;
 import com.tanjinc.tmediaplayer.widgets.ShareWidget;
@@ -56,6 +57,7 @@ public class MovieController extends RelativeLayout implements IController{
     private PlayerMenuWidget mPlayerMenuWidget;
     private ShareWidget mShareWidget;
 
+    private ArrayList<IWidget> mWidgets = new ArrayList<>();
     private enum PlayState {
 
     }
@@ -137,6 +139,7 @@ public class MovieController extends RelativeLayout implements IController{
     private void addWidgets() {
         mPlayerMenuWidget = new PlayerMenuWidget(mContext);
         addView(mPlayerMenuWidget);
+        mWidgets.add(mPlayerMenuWidget);
 
         ArrayList<PlayerMenuWidget.PlayerMenuData> menuData = new ArrayList<PlayerMenuWidget.PlayerMenuData>();
         menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_PLAY, "播放"));
@@ -157,6 +160,9 @@ public class MovieController extends RelativeLayout implements IController{
         mShareWidget = new ShareWidget(mContext);
         addView(mShareWidget);
         mShareWidget.resetLayout(mIsHorizontal);
+        mWidgets.add(mShareWidget);
+
+
     }
 
     private void resetLayout() {
@@ -201,7 +207,7 @@ public class MovieController extends RelativeLayout implements IController{
                 if (duration != 0) {
                     mSeekBar.setProgress((int) (currenttime * SEEK_BAR_MAX / duration));
                     mSeekBar.setSecondaryProgress((int) (bufferposition * SEEK_BAR_MAX / duration));
-                    Log.e(TAG, "video current: " +currenttime +" buffer: "+ bufferposition);
+//                    Log.e(TAG, "video current: " +currenttime +" buffer: "+ bufferposition);
                 }
                 mHandler.removeCallbacks(progressRunnable);
                 mHandler.postDelayed(progressRunnable, 1000);
@@ -256,9 +262,13 @@ public class MovieController extends RelativeLayout implements IController{
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (mPlayerMenuWidget.isShown()) {
-            mPlayerMenuWidget.hideWithAnim(true);
-            return false;
+//        if (mPlayerMenuWidget.isShown()) {
+//            mPlayerMenuWidget.hideWithAnim(true);
+//            return false;
+//        }
+
+        for (IWidget i:mWidgets) {
+            i.hideWithAnim(true);
         }
         if(mIsShowing) {
             hideController();

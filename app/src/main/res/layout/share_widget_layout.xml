@@ -17,6 +17,17 @@
             android:layout_height="wrap_content"
             android:background="@drawable/ic_weibo_logo"/>
 
+        <com.tanjinc.tmediaplayer.widgets.WXShareView
+            android:id="@+id/wx_view"
+            android:layout_width="78dp"
+            android:layout_height="78dp"
+            android:background="@drawable/ic_wx_logo"/>
+        <com.tanjinc.tmediaplayer.widgets.WXShareView
+            android:id="@+id/wx_timeline"
+            android:layout_width="78dp"
+            android:layout_height="78dp"
+            android:background="@drawable/ic_pengyouquan_logo"/>
+
     </LinearLayout>
 
 </FrameLayout>

@@ -74,7 +74,7 @@ public class LocalVideoFragment extends ListFragment implements VideoContract.Vi
         Intent intent = new Intent(getActivity(), VideoPlayActivity.class);
         intent.setData(uri);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        getActivity().startActivity(intent);
+        startActivity(intent);
     }
 
     private void addTest(ArrayList list) {
