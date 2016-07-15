@@ -34,7 +34,9 @@ public class ShareWidget extends FrameLayout implements IWidget {
     private TextView mWeiboBtn;
     private LinearLayout mRoot;
 
-    private WBShareView mWBShareView;
+    private WeiboShareView mWeiboShareView;
+    private WXShareView mWXShareView;
+    private WXShareView mWXSceneTimelineView;
 
 
     public ShareWidget(Context context) {
@@ -57,6 +59,26 @@ public class ShareWidget extends FrameLayout implements IWidget {
                 mWBShareView.share();
             }
         });
+
+        mWXShareView = (WXShareView) findViewById(R.id.wx_view);
+        mWXShareView.initView((Activity) mContext);
+        mWXShareView.setFocusable(true);
+        mWXShareView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mWXShareView.share(true);
+            }
+        });
+
+        mWXSceneTimelineView = (WXShareView) findViewById(R.id.wx_timeline);
+        mWXSceneTimelineView.initView((Activity) mContext);
+        mWXSceneTimelineView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mWXSceneTimelineView.share(false);
+            }
+        });
+
     }
 
     @Override

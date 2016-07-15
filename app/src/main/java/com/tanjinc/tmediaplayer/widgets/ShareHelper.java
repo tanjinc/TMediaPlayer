@@ -1,9 +1,7 @@
 package com.tanjinc.tmediaplayer.widgets;
 
 /**
- * Created by tanjinc on 16-5-17.
+ * Created by tanjincheng on 16/5/19.
  */
 public class ShareHelper {
-
-
 }

@@ -5,27 +5,25 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.widget.ImageView;
+import android.view.View;
+import android.widget.ImageButton;
 
 import com.tanjinc.tmediaplayer.R;
-import com.tanjinc.tmediaplayer.data.WeiXinConstants;
+import com.tanjinc.tmediaplayer.data.WXConstants;
 import com.tencent.mm.sdk.openapi.IWXAPI;
 import com.tencent.mm.sdk.openapi.SendMessageToWX;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
 import com.tencent.mm.sdk.openapi.WXMediaMessage;
 import com.tencent.mm.sdk.openapi.WXVideoObject;
+import com.tencent.mm.sdk.platformtools.BackwardSupportUtil;
 import com.tencent.mm.sdk.platformtools.Util;
 
 /**
- * Created by tanjinc on 16-5-17.
+ * Created by tanjincheng on 16/5/19.
  */
-public class WXShareView extends ImageView {
-    private static final String TAG = "WeChatView";
-
+public class WXShareView extends ImageButton{
     private Activity mActivity;
-    private IWXAPI mAPI;
-
+    private IWXAPI mApi;
     public WXShareView(Context context) {
         this(context, null);
     }
@@ -40,29 +38,24 @@ public class WXShareView extends ImageView {
 
     public void initView(Activity activity) {
         mActivity = activity;
-        mAPI = WXAPIFactory.createWXAPI(mActivity, WeiXinConstants.APP_ID, true);
-        mAPI.registerApp(WeiXinConstants.APP_ID);
+        mApi = WXAPIFactory.createWXAPI(mActivity, WXConstants.APP_ID, true);
+        mApi.registerApp(WXConstants.APP_ID);
     }
-
-    private String buildTransaction(final String type) {
-        return (type == null) ? String.valueOf(System.currentTimeMillis()) : type + System.currentTimeMillis();
-    }
-
-    public void share(){
+    public void share(boolean isSession) {
         WXVideoObject videoObject = new WXVideoObject();
         videoObject.videoUrl = "http://www.modrails.com/videos/passenger_nginx.mov";
 
         WXMediaMessage msg = new WXMediaMessage(videoObject);
-        msg.title = "Video Title Very Long Very Long Very ry Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long";
-        msg.description = "Video Description Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long Very Long";
-        Bitmap thumb = BitmapFactory.decodeResource(getResources(), R.drawable.ic_play);
-        msg.thumbData = Util.bmpToByteArray(thumb, true);
+        msg.title = "test mp4";
+        msg.description = "just a test for video";
+        Bitmap  bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+        msg.thumbData = Util.bmpToByteArray(bitmap, true);
 
         SendMessageToWX.Req req = new SendMessageToWX.Req();
-        req.transaction = buildTransaction("video");// transaction字段用于唯一标识一个请求
+        req.transaction = String.valueOf(System.currentTimeMillis());
         req.message = msg;
-        req.scene = SendMessageToWX.Req.WXSceneTimeline;
-        boolean ret = mAPI.sendReq(req);
-        Log.d(TAG, "share: ret" + ret);
+        req.scene = isSession ? SendMessageToWX.Req.WXSceneSession : SendMessageToWX.Req.WXSceneTimeline;
+
+        mApi.sendReq(req);
     }
 }

@@ -127,9 +127,9 @@ public class WBShareView extends ImageButton implements WeiboAuthListener{
 
 
         videoObject.setThumbImage(bitmap);
-        videoObject.actionUrl = "test.mp4";
-        videoObject.dataUrl = "www.weibo.com";
-        videoObject.dataHdUrl = "www.weibo.com";
+        videoObject.actionUrl = "http://www.modrails.com/videos/passenger_nginx.mov";
+        videoObject.dataUrl = "http://www.modrails.com/videos/passenger_nginx.mov";
+        videoObject.dataHdUrl = "http://www.modrails.com/videos/passenger_nginx.mov";
         videoObject.duration = 10;
         videoObject.defaultText = "Vedio 默认文案";
         return videoObject;
@@ -156,8 +156,8 @@ public class WBShareView extends ImageButton implements WeiboAuthListener{
         // 3. 发送请求消息到微博，唤起微博分享界面
         Oauth2AccessToken accessToken = AccessTokenKeeper.readAccessToken(mActivity.getApplicationContext());
         String token = "";
-        if (accessToken != null && !accessToken.getToken().equals("") ) {
-            token = accessToken.getToken();
+        if (accessToken != null && accessToken.getToken().equals("")) {
+
         } else {
             if (mSsoHandler == null && mAuthInfo != null) {
                 mSsoHandler = new SsoHandler(mActivity, mAuthInfo);
@@ -174,6 +174,7 @@ public class WBShareView extends ImageButton implements WeiboAuthListener{
 
     @Override
     public void onComplete(Bundle bundle) {
+        Log.d(TAG, "video onComplete: ");
         Oauth2AccessToken newToken = Oauth2AccessToken.parseAccessToken(bundle);
         AccessTokenKeeper.writeAccessToken(mActivity.getApplicationContext(), newToken);
         Log.d(TAG, "onComplete: newToken=" + newToken);
