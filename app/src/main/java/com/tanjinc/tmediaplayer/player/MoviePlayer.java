@@ -2,6 +2,7 @@ package com.tanjinc.tmediaplayer.player;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
@@ -105,5 +106,9 @@ public class MoviePlayer extends FrameLayout {
             default:
                 return super.onKeyDown(keyCode, event);
         }
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
     }
 }

@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.ListFragment;
+import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,14 +19,23 @@ import android.widget.TextView;
 import com.tanjinc.tmediaplayer.data.VideoData;
 import com.tanjinc.tmediaplayer.player.VideoPlayActivity;
 import com.tanjinc.tmediaplayer.utils.ImageUtil;
+import com.tanjinc.tmediaplayer.utils.SDCardHelper;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by tanjincheng on 16/2/20.
  */
 public class LocalVideoFragment extends ListFragment implements VideoContract.View{
 
+    private static final String TAG = "LocalVideoFragment";
     private LocalVideoAdapter mAdapter;
     private Context mContext;
     private ListView mListView;
@@ -50,6 +61,9 @@ public class LocalVideoFragment extends ListFragment implements VideoContract.Vi
         return view;
     }
 
+    private Uri uri;
+    private Handler handler = new Handler();
+
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -57,7 +71,21 @@ public class LocalVideoFragment extends ListFragment implements VideoContract.Vi
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                startVideoPlayerActivity(Uri.parse(mVideoList.get(position).getPath()));
+//                startVideoPlayerActivity(Uri.parse(mVideoList.get
+//                        (position).getPath()));
+
+//                Intent intent = new Intent(Intent.ACTION_VIEW);
+//                uri = Uri.parse(mVideoList.get(position).getPath());
+//                intent.setDataAndType(uri, "video/*");
+//                intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+//                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+////                intent.setClassName("com.meizu.media.video", ".player.ui.VideoWindowActivity");
+//                startActivity(intent);
+
+//                SDCardHelper.createInstance(mContext);
+//                SDCardHelper.getInstance().getMountPointList(mContext);
+//                SDCardHelper.MountPoint  a = SDCardHelper.getInstance().getSDCardMountPoint();
+//                boolean b = SDCardHelper.getInstance().isMounted();
             }
         });
     }

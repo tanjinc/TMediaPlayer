@@ -1,6 +1,7 @@
 package com.tanjinc.tmediaplayer.widgets;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.media.Image;
 import android.support.v7.widget.RecyclerView;
@@ -33,7 +34,7 @@ public class PlayerMenuAdapter extends RecyclerView.Adapter<PlayerMenuAdapter.Vi
 
     @Override
     public void onClick(View v) {
-        if (mItemClickListener != null && v.getTag() != -1) {
+        if (mItemClickListener != null && (Integer)v.getTag() != -1) {
             mItemClickListener.onItemClick(v, (Integer) v.getTag());
         }
     }

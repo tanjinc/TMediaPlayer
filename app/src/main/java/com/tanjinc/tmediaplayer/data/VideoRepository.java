@@ -20,6 +20,6 @@ public interface VideoRepository {
         void onDataNotAvailable();
     }
 
-    void getLocalVideoList(LoadVideoCallback callback);
+    void getVideoList(LoadVideoCallback callback);
 
 }

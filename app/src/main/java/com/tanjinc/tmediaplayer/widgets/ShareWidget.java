@@ -5,28 +5,21 @@ import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
 import android.os.Build;
 import android.support.v4.view.animation.PathInterpolatorCompat;
-import android.support.v7.widget.LinearLayoutCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.tanjinc.tmediaplayer.R;
-
-import java.util.zip.Inflater;
 
 /**
  * Created by tanjincheng on 16/5/14.
@@ -41,7 +34,7 @@ public class ShareWidget extends FrameLayout implements IWidget {
     private TextView mWeiboBtn;
     private LinearLayout mRoot;
 
-    private WeiboShareView mWeiboShareView;
+    private WBShareView mWBShareView;
 
 
     public ShareWidget(Context context) {
@@ -56,12 +49,12 @@ public class ShareWidget extends FrameLayout implements IWidget {
         LayoutInflater.from(mContext).inflate(R.layout.share_widget_layout,this);
         mRoot = (LinearLayout) findViewById(R.id.share_item_container);
 
-        mWeiboShareView = (WeiboShareView) findViewById(R.id.weibo_view);
-        mWeiboShareView.initView((Activity) mContext);
-        mWeiboShareView.setOnClickListener(new OnClickListener() {
+        mWBShareView = (WBShareView) findViewById(R.id.weibo_view);
+        mWBShareView.initView((Activity) mContext);
+        mWBShareView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                mWeiboShareView.share();
+                mWBShareView.share();
             }
         });
     }
@@ -156,5 +149,9 @@ public class ShareWidget extends FrameLayout implements IWidget {
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         }
         setLayoutParams(layoutParams);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        mWBShareView.onActivityResult(requestCode, resultCode, data);
     }
 }

@@ -10,6 +10,9 @@ public class VideoData {
     private String name;
     private String path;
     public Bitmap thumbnail;
+
+
+
     public String thumbPath;
     private String parentDir;
 
@@ -43,5 +46,13 @@ public class VideoData {
 
     public void setParentDir(String parentDir) {
         this.parentDir = parentDir;
+    }
+
+    public String getThumbPath() {
+        return thumbPath;
+    }
+
+    public void setThumbPath(String thumbPath) {
+        this.thumbPath = thumbPath;
     }
 }

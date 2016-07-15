@@ -3,6 +3,7 @@ package com.tanjinc.tmediaplayer.widgets;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
@@ -37,7 +38,7 @@ import java.io.IOException;
 /**
  * Created by tanjincheng on 16/5/14.
  */
-public class WeiboShareView extends ImageButton implements WeiboAuthListener{
+public class WBShareView extends ImageButton implements WeiboAuthListener{
     private static final String TAG = "WeiboShareView";
 
     public static final String KEY_SHARE_TYPE = "key_share_type";
@@ -53,20 +54,20 @@ public class WeiboShareView extends ImageButton implements WeiboAuthListener{
     private Oauth2AccessToken mAccessToken;
     private IWeiboShareAPI mWeiboShareAPI = null;
 
-    public WeiboShareView(Context context) {
+    public WBShareView(Context context) {
         super(context, null);
     }
 
-    public WeiboShareView(Context context, AttributeSet attrs) {
+    public WBShareView(Context context, AttributeSet attrs) {
         super(context, attrs, 0);
     }
 
-    public WeiboShareView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public WBShareView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public WeiboShareView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public WBShareView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
@@ -110,7 +111,7 @@ public class WeiboShareView extends ImageButton implements WeiboAuthListener{
         try {
             os = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 85, os);
-            System.out.println("kkkkkkk    size  "+ os.toByteArray().length );
+            Log.d(TAG, "getVideoObj: ");
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("Weibo.BaseMediaObject", "put thumb failed");
@@ -120,7 +121,7 @@ public class WeiboShareView extends ImageButton implements WeiboAuthListener{
                     os.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e(TAG, "getVideoObj: e" + e);
             }
         }
 
@@ -141,13 +142,10 @@ public class WeiboShareView extends ImageButton implements WeiboAuthListener{
      *
      */
     private void sendMessage() {
-
         // 1. 初始化微博的分享消息
         WeiboMultiMessage weiboMessage = new WeiboMultiMessage();
-
         // 用户可以分享视频资源
         weiboMessage.mediaObject = getVideoObj();
-
 
         // 2. 初始化从第三方到微博的消息请求
         SendMultiMessageToWeiboRequest request = new SendMultiMessageToWeiboRequest();
@@ -158,11 +156,13 @@ public class WeiboShareView extends ImageButton implements WeiboAuthListener{
         // 3. 发送请求消息到微博，唤起微博分享界面
         Oauth2AccessToken accessToken = AccessTokenKeeper.readAccessToken(mActivity.getApplicationContext());
         String token = "";
-        if (accessToken != null) {
+        if (accessToken != null && !accessToken.getToken().equals("") ) {
             token = accessToken.getToken();
         } else {
-            mSsoHandler = new SsoHandler(mActivity, mAuthInfo);
-            mSsoHandler.authorizeClientSso(this);
+            if (mSsoHandler == null && mAuthInfo != null) {
+                mSsoHandler = new SsoHandler(mActivity, mAuthInfo);
+                mSsoHandler.authorize(this);
+            }
         }
         mWeiboShareAPI.sendRequest(mActivity, request, mAuthInfo, token, this);
     }
@@ -176,6 +176,7 @@ public class WeiboShareView extends ImageButton implements WeiboAuthListener{
     public void onComplete(Bundle bundle) {
         Oauth2AccessToken newToken = Oauth2AccessToken.parseAccessToken(bundle);
         AccessTokenKeeper.writeAccessToken(mActivity.getApplicationContext(), newToken);
+        Log.d(TAG, "onComplete: newToken=" + newToken);
     }
 
     @Override
@@ -186,5 +187,12 @@ public class WeiboShareView extends ImageButton implements WeiboAuthListener{
     @Override
     public void onCancel() {
 
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (mSsoHandler != null) {
+            Log.d(TAG, "onActivityResult: ");
+            mSsoHandler.authorizeCallBack(requestCode, resultCode, data);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.tanjinc.tmediaplayer.player;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Handler;
 import android.os.Message;
@@ -218,6 +219,7 @@ public class MovieController extends RelativeLayout implements IController{
     public void showController() {
         mBottomPart.setVisibility(VISIBLE);
         mTopPart.setVisibility(VISIBLE);
+        mShareWidget.showWithAnim(true);
         mIsShowing = true;
     }
 
@@ -273,5 +275,9 @@ public class MovieController extends RelativeLayout implements IController{
         mIsHorizontal = newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE;
         resetLayout();
         super.onConfigurationChanged(newConfig);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        mShareWidget.onActivityResult(requestCode, resultCode, data);
     }
 }

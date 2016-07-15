@@ -29,7 +29,7 @@ public class LocalVideoDataSource implements VideoRepository{
     }
 
     @Override
-    public void getLocalVideoList(LoadVideoCallback callback) {
+    public void getVideoList(LoadVideoCallback callback) {
         mLoadVideoCallback = callback;
         mLoadTask.execute();
     }

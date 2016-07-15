@@ -35,7 +35,6 @@ public class VideoPlayActivity extends AppCompatActivity implements IWeiboHandle
         super.onCreate(savedInstanceState);
         setContentView(R.layout.player_root);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        getWindow().addFlags(Window.FEATURE_ACTION_BAR_OVERLAY);
         mRoot = (FrameLayout) findViewById(R.id.root);
         mPlayer = new MoviePlayer(this);
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -87,5 +86,10 @@ public class VideoPlayActivity extends AppCompatActivity implements IWeiboHandle
                         Toast.LENGTH_LONG).show();
                 break;
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+            mPlayer.onActivityResult(requestCode, resultCode, data);
     }
 }

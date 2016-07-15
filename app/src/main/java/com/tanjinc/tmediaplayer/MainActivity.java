@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -22,7 +23,7 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ListView;
 
-import com.tanjinc.tmediaplayer.data.LocalVideoDataSource;
+import com.tanjinc.tmediaplayer.data.DoubanMovieDataSource;
 import com.tanjinc.tmediaplayer.player.VideoUtils;
 
 
@@ -48,7 +49,8 @@ public class MainActivity extends AppCompatActivity {
             localLayoutParams.flags = (WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | localLayoutParams.flags);
         }
         mContext = this;
-        android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+//        android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        FragmentTransaction transaction =  getSupportFragmentManager().beginTransaction();
 
 
         final SharedPreferences sharedPreferences = getSharedPreferences("tanjinc", Context.MODE_PRIVATE);
@@ -76,12 +78,15 @@ public class MainActivity extends AppCompatActivity {
         //create view
         if (savedInstanceState == null) {
             mLocalVideoFragment = new LocalVideoFragment();
-            transaction.add(R.id.fragment_container2, (Fragment) mLocalVideoFragment, "video");
+//            transaction.add(R.id.fragment_container2, (Fragment) mLocalVideoFragment, "video");
+            DoubanMovieFragment doubanMovieFragment = new DoubanMovieFragment();
+            transaction.add(doubanMovieFragment, "douban");
             transaction.commit();
         }
 
         // create presenter
-        mPresenter = new LocalVideoPresenter(mLocalVideoFragment, new LocalVideoDataSource(mContext));
+//        mPresenter = new LocalVideoPresenter(mLocalVideoFragment, new LocalVideoDataSource(mContext));
+        mPresenter = new LocalVideoPresenter(mLocalVideoFragment, new DoubanMovieDataSource(mContext));
         getContentResolver();
 
     }
