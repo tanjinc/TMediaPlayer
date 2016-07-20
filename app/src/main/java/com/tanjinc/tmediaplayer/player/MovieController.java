@@ -131,7 +131,7 @@ public class MovieController extends RelativeLayout implements IController{
                 mShareWidget.showWithAnim(true);
             }
         });
-        mShareBtn.setVisibility(VISIBLE);
+        mShareBtn.setVisibility(GONE);
 
         addWidgets();
         resetLayout();
@@ -225,7 +225,6 @@ public class MovieController extends RelativeLayout implements IController{
     public void showController() {
         mBottomPart.setVisibility(VISIBLE);
         mTopPart.setVisibility(VISIBLE);
-        mShareWidget.showWithAnim(true);
         mIsShowing = true;
     }
 

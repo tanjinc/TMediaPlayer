@@ -34,7 +34,7 @@ public class ShareWidget extends FrameLayout implements IWidget {
     private TextView mWeiboBtn;
     private LinearLayout mRoot;
 
-    private WeiboShareView mWeiboShareView;
+    private WBShareView mWBShareView;
     private WXShareView mWXShareView;
     private WXShareView mWXSceneTimelineView;
 

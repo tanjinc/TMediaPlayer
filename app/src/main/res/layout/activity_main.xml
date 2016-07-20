@@ -11,12 +11,11 @@
 
         <include layout="@layout/toolbar_layout"/>
 
-        <FrameLayout
-            android:id="@+id/container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <include layout="@layout/fragment_container"/>
-        </FrameLayout>
+        <android.support.v4.view.ViewPager
+            android:id="@+id/view_pager"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </android.support.v4.view.ViewPager>
     </LinearLayout>
 
     <ListView
