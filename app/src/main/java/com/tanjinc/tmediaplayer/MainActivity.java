@@ -3,6 +3,7 @@ package com.tanjinc.tmediaplayer;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -11,6 +12,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -22,6 +24,7 @@ import com.tanjinc.tmediaplayer.data.LocalVideoDataSource;
 import com.tanjinc.tmediaplayer.player.VideoUtils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,15 +41,17 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
 
+    @BindView(R.id.tablayout)
+    TabLayout mTablayout;
+
     private Fragment mLocalVideoFragment;
     private Fragment mDoubanMovieFragment;
     private ViewPagerAdapter mViewPagerAdapter;
 
     private ArrayList<Fragment> mFragmentArrayList = new ArrayList<>();
-
+    private ArrayList<String> mTitleList = new ArrayList<>();
 
     private LocalVideoPresenter mPresenter;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,24 +82,30 @@ public class MainActivity extends AppCompatActivity {
         mFragmentArrayList.add(mLocalVideoFragment);
         mFragmentArrayList.add(mDoubanMovieFragment);
 
+        mTitleList.add("本地视频");
+        mTitleList.add("豆瓣Top10");
+
+
         mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mViewPagerAdapter);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+                Log.d(TAG, "video onPageScrolled: " + position);
             }
 
             @Override
             public void onPageSelected(int position) {
-
+                Log.d(TAG, "video onPageSelected: " + position);
             }
 
             @Override
             public void onPageScrollStateChanged(int state) {
-
+                Log.d(TAG, "video onPageScrollStateChanged: " + state);
             }
         });
+
+        mTablayout.setupWithViewPager(mViewPager);
     }
 
     private void initDrawerLayout() {
@@ -148,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return super.getPageTitle(position);
+            return mTitleList != null && position < mTitleList.size() ? mTitleList.get(position) : null;
         }
     }
 }

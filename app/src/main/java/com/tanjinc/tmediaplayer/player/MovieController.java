@@ -4,54 +4,59 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Handler;
-import android.os.Message;
-import android.support.v4.util.TimeUtils;
-import android.text.format.DateUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.Animation;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.tanjinc.tmediaplayer.R;
 import com.tanjinc.tmediaplayer.widgets.IWidget;
-import com.tanjinc.tmediaplayer.widgets.PlayerMenuAdapter;
 import com.tanjinc.tmediaplayer.widgets.PlayerMenuWidget;
 import com.tanjinc.tmediaplayer.widgets.ShareWidget;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 
 /**
  * Created by tanjincheng on 16/3/30.
  */
-public class MovieController extends RelativeLayout implements IController{
+public class MovieController extends RelativeLayout implements IController {
 
     private static final int SEEK_BAR_MAX = 10000;
     private static final String TAG = "MovieController";
+
+    @BindView(R.id.title)
+    TextView mTitle;
+    @BindView(R.id.share_btn)
+    Button mShareBtn;
+    @BindView(R.id.top_layout)
+    RelativeLayout mTopLayout;
+    @BindView(R.id.play)
+    ImageButton mPlayBtn;
+    @BindView(R.id.currenttime_tv)
+    TextView mCurrenttimeTextView;
+    @BindView(R.id.seekbar)
+    SeekBar mSeekbar;
+    @BindView(R.id.duration_tv)
+    TextView mDurationTextView;
+    @BindView(R.id.player_menu_btn)
+    Button mPlayerMenuBtn;
+    @BindView(R.id.bottom_layout)
+    RelativeLayout mBottomLayout;
+
     private Context mContext;
-    private View mTopPart;
-    private View mBottomPart;
     private boolean mIsShowing;
     private IVideoView mPlayer;
 
-    private ImageButton mPlayBtn;
-    private Button mMenuBtn;
-    private Button mShareBtn;
-    private SeekBar mSeekBar;
-    private TextView mCurrentTimeTv;
-    private TextView mDurationTv;
-    private TextView mTitleTv;
 
     private boolean mIsHorizontal;
     //widget
@@ -59,6 +64,34 @@ public class MovieController extends RelativeLayout implements IController{
     private ShareWidget mShareWidget;
 
     private ArrayList<IWidget> mWidgets = new ArrayList<>();
+
+    @OnClick({R.id.share_btn, R.id.play, R.id.player_menu_btn})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.share_btn:
+                mShareWidget.showWithAnim(true);
+                break;
+            case R.id.play:
+                if (mPlayer.isPlaying()) {
+                    mPlayer.pause();
+                    mPlayBtn.setActivated(false);
+                    mHandler.removeCallbacks(progressRunnable);
+                } else {
+                    mPlayer.start();
+                    mPlayBtn.setActivated(true);
+                    mHandler.post(progressRunnable);
+                }
+                break;
+            case R.id.player_menu_btn:
+                if (mPlayerMenuWidget.isShown()) {
+                    mPlayerMenuWidget.hideWithAnim(true);
+                } else {
+                    mPlayerMenuWidget.showWithAnim(true);
+                }
+                break;
+        }
+    }
+
     private enum PlayState {
 
     }
@@ -77,62 +110,13 @@ public class MovieController extends RelativeLayout implements IController{
     }
 
     private void init() {
-        LayoutInflater.from(mContext).inflate(R.layout.player_controller_layout, this);
-
+        View view = LayoutInflater.from(mContext).inflate(R.layout.player_controller_layout, this);
+        ButterKnife.bind(this, view);
         mIsHorizontal = mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
-
-        mTopPart = findViewById(R.id.top_layout);
-        mBottomPart = findViewById(R.id.bottom_layout);
-
-        mTitleTv = (TextView) findViewById(R.id.title);
-
-        mSeekBar = (SeekBar) findViewById(R.id.seekbar);
-        mSeekBar.setMax(SEEK_BAR_MAX);
-        mSeekBar.setOnSeekBarChangeListener(mSeekBarChangeListener);
-        mSeekBar.setThumb(null);
-
-        mCurrentTimeTv = (TextView) findViewById(R.id.currenttime_tv);
-        mDurationTv = (TextView) findViewById(R.id.duration_tv);
-
-        mPlayBtn = (ImageButton) findViewById(R.id.play);
-        mPlayBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mPlayer.isPlaying()) {
-                    mPlayer.pause();
-                    mPlayBtn.setActivated(false);
-                    mHandler.removeCallbacks(progressRunnable);
-                } else {
-                    mPlayer.start();
-                    mPlayBtn.setActivated(true);
-                    mHandler.post(progressRunnable);
-                }
-            }
-        });
-
-        mMenuBtn = (Button) findViewById(R.id.player_menu_btn);
-        mMenuBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mPlayerMenuWidget.isShown()) {
-                    mPlayerMenuWidget.hideWithAnim(true);
-                } else {
-                    mPlayerMenuWidget.showWithAnim(true);
-                }
-            }
-        });
-        mMenuBtn.setVisibility(VISIBLE);
-
-        //share button
-        mShareBtn = (Button) findViewById(R.id.share_btn);
-        mShareBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mShareWidget.showWithAnim(true);
-            }
-        });
+        mSeekbar.setMax(SEEK_BAR_MAX);
+        mSeekbar.setOnSeekBarChangeListener(mSeekBarChangeListener);
+        mSeekbar.setThumb(null);
         mShareBtn.setVisibility(GONE);
-
         addWidgets();
         resetLayout();
     }
@@ -144,19 +128,18 @@ public class MovieController extends RelativeLayout implements IController{
 
         ArrayList<PlayerMenuWidget.PlayerMenuData> menuData = new ArrayList<PlayerMenuWidget.PlayerMenuData>();
         menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_PLAY, "播放"));
-        menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_PLAY,false,"单个循环"));
-        menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_PLAY,false,"连续播放"));
-        menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_SCREEN,"窗口大小"));
-        menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_SCREEN,true,"屏幕适应"));
-        menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_SCREEN,false, "全屏"));
-        menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_SCREEN,false,"原尺寸"));
+        menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_PLAY, false, "单个循环"));
+        menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_PLAY, false, "连续播放"));
+        menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_SCREEN, "窗口大小"));
+        menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_SCREEN, true, "屏幕适应"));
+        menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_SCREEN, false, "全屏"));
+        menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_SCREEN, false, "原尺寸"));
         menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_DNLA, "DLNA"));
         menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_DNLA, false, "codi"));
         menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_DNLA, false, "xbmc"));
         menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_DNLA, false, "xiaomi"));
         mPlayerMenuWidget.setMenuData(menuData);
         mPlayerMenuWidget.hideWithAnim(false);
-
 
         mShareWidget = new ShareWidget(mContext);
         addView(mShareWidget);
@@ -195,19 +178,19 @@ public class MovieController extends RelativeLayout implements IController{
     private Runnable progressRunnable = new Runnable() {
         @Override
         public void run() {
-            if (mPlayer != null && mSeekBar != null) {
+            if (mPlayer != null && mSeekbar != null) {
                 long currenttime = mPlayer.getCurrentPosition();
                 long duration = mPlayer.getDuration();
                 long bufferposition = mPlayer.getBufferedPosition();
-                if (bufferposition < 0 ) {
+                if (bufferposition < 0) {
                     bufferposition = 0;
                 }
 
-                mCurrentTimeTv.setText(VideoUtils.length2time(currenttime));
-                mDurationTv.setText(VideoUtils.length2time(duration));
+                mCurrenttimeTextView.setText(VideoUtils.length2time(currenttime));
+                mDurationTextView.setText(VideoUtils.length2time(duration));
                 if (duration != 0) {
-                    mSeekBar.setProgress((int) (currenttime * SEEK_BAR_MAX / duration));
-                    mSeekBar.setSecondaryProgress((int) (bufferposition * SEEK_BAR_MAX / duration));
+                    mSeekbar.setProgress((int) (currenttime * SEEK_BAR_MAX / duration));
+                    mSeekbar.setSecondaryProgress((int) (bufferposition * SEEK_BAR_MAX / duration));
 //                    Log.e(TAG, "video current: " +currenttime +" buffer: "+ bufferposition);
                 }
                 mHandler.removeCallbacks(progressRunnable);
@@ -218,20 +201,20 @@ public class MovieController extends RelativeLayout implements IController{
 
     @Override
     public void setTitle(String title) {
-        mTitleTv.setText(title);
+        mTitle.setText(title);
     }
 
     @Override
     public void showController() {
-        mBottomPart.setVisibility(VISIBLE);
-        mTopPart.setVisibility(VISIBLE);
+        mBottomLayout.setVisibility(VISIBLE);
+        mTopLayout.setVisibility(VISIBLE);
         mIsShowing = true;
     }
 
     @Override
     public void hideController() {
-        mTopPart.setVisibility(GONE);
-        mBottomPart.setVisibility(GONE);
+        mBottomLayout.setVisibility(GONE);
+        mTopLayout.setVisibility(GONE);
         mIsShowing = false;
     }
 
@@ -268,10 +251,10 @@ public class MovieController extends RelativeLayout implements IController{
 //            return false;
 //        }
 
-        for (IWidget i:mWidgets) {
+        for (IWidget i : mWidgets) {
             i.hideWithAnim(true);
         }
-        if(mIsShowing) {
+        if (mIsShowing) {
             hideController();
         } else {
             showController();
