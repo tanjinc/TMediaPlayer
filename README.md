@@ -1,4 +1,4 @@
-### 这是一个android 多媒体播放器训练场
+### 这是一个android 多媒体播放器、 一些控件、开源库练习
 目前使用
  * ExoPlayer
  * MediaPlayer
