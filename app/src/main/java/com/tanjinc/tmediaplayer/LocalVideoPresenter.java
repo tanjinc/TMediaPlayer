@@ -51,6 +51,21 @@ public class LocalVideoPresenter implements VideoContract.Presenter{
     }
 
     @Override
+    public void loadMoreVideo() {
+        mRepository.getMoreVideo(new VideoRepository.LoadVideoCallback() {
+            @Override
+            public void onVideoLoaded(ArrayList<VideoData> videos) {
+                mView.showVideoList(videos);
+            }
+
+            @Override
+            public void onDataNotAvailable() {
+
+            }
+        });
+    }
+
+    @Override
     public void completeLoad() {
 
     }

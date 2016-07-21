@@ -24,21 +24,53 @@ public class DoubanMovieDataSource implements VideoRepository {
 
     private ArrayList<VideoData> mVideoData = new ArrayList<>();
 
-    public DoubanMovieDataSource(Context context) {
+    private Retrofit mRetrofit;
+    private DoubanMovieService mDoubanMovieService;
 
+    private int mLoadStart = 0;
+    private int mLoadCount = 10;
+
+    public DoubanMovieDataSource(Context context) {
+        mRetrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        mDoubanMovieService = mRetrofit.create(DoubanMovieService.class);
     }
 
     @Override
     public void getVideoList(final LoadVideoCallback callback) {
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        DoubanMovieService service = retrofit.create(DoubanMovieService.class);
-        Call<DoubanMovieEntity> repos = service.getTopMovie(0, 5);
+        if (mVideoData != null && mVideoData.size() != 0) {
+            return;
+        }
+        Call<DoubanMovieEntity> repos = mDoubanMovieService.getTopMovie(mLoadStart, mLoadCount);
         repos.enqueue(new Callback<DoubanMovieEntity>() {
+            @Override
+            public void onResponse(Call<DoubanMovieEntity> call, Response<DoubanMovieEntity> response) {
+                DoubanMovieEntity data = response.body();
+                for (Subject subject: data.getSubjects()) {
+                    VideoData videoData = new VideoData();
+                    videoData.setName(subject.getTitle());
+                    videoData.setThumbPath((subject.getImages().getMedium()));
+                    videoData.setPath(subject.getOriginal_title());
+                    mVideoData.add(videoData);
+                }
+                callback.onVideoLoaded(mVideoData);
+            }
+
+            @Override
+            public void onFailure(Call<DoubanMovieEntity> call, Throwable t) {
+                Log.e(TAG, "失败: ", t);
+            }
+        });
+    }
+
+    @Override
+    public void getMoreVideo(final LoadVideoCallback callback) {
+        mLoadStart += mLoadCount;
+        mDoubanMovieService.getTopMovie(mLoadStart, mLoadCount).enqueue(new Callback<DoubanMovieEntity>() {
             @Override
             public void onResponse(Call<DoubanMovieEntity> call, Response<DoubanMovieEntity> response) {
                 DoubanMovieEntity data = response.body();

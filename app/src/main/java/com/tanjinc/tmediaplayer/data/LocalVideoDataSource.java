@@ -34,6 +34,11 @@ public class LocalVideoDataSource implements VideoRepository{
         mLoadTask.execute();
     }
 
+    @Override
+    public void getMoreVideo(LoadVideoCallback callback) {
+
+    }
+
     private class VideoProviderAsyncTask extends AsyncTask<VideoData, VideoData, ArrayList<VideoData>> {
 
         private Context mContext;

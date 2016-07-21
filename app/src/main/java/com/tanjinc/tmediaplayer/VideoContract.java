@@ -23,6 +23,8 @@ public interface VideoContract {
     interface Presenter {
         void loadVideo();
 
+        void loadMoreVideo();
+
         void completeLoad();
 
         void start();

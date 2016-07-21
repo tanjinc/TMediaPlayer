@@ -22,4 +22,6 @@ public interface VideoRepository {
 
     void getVideoList(LoadVideoCallback callback);
 
+    void getMoreVideo(LoadVideoCallback callback);
+
 }
