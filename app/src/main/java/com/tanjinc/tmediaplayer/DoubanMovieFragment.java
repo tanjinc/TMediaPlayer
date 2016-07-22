@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -37,8 +38,8 @@ public class DoubanMovieFragment extends Fragment implements VideoContract.View,
 
     private VideoContract.Presenter mPresenter;
 
-    private OnlineVideoAdapter mAdapter;
-    private LinearLayoutManager mLinearLayoutManager;
+    private DoubanMovieAdapter mAdapter;
+    private GridLayoutManager mLinearLayoutManager;
 
     private int lastVisibleItem;
 
@@ -52,8 +53,19 @@ public class DoubanMovieFragment extends Fragment implements VideoContract.View,
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_douban_layout, container, false);
         ButterKnife.bind(this, view);
-        mAdapter = new OnlineVideoAdapter(getContext());
-        mLinearLayoutManager = new LinearLayoutManager(getContext());
+        mAdapter = new DoubanMovieAdapter(getContext());
+        mAdapter.setOnItemClickListener(new DoubanMovieAdapter.OnItemCLickListener() {
+            @Override
+            public void onItemClick(int postion) {
+                Log.d(TAG, "onItemClick: " + postion);
+            }
+
+            @Override
+            public boolean onLongClick(int postion) {
+                return false;
+            }
+        });
+        mLinearLayoutManager = new GridLayoutManager(getContext(), 4);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -114,73 +126,5 @@ public class DoubanMovieFragment extends Fragment implements VideoContract.View,
     public void onRefresh() {
         mPresenter.loadVideo();
         mSwipeRefreshLayout.setRefreshing(false);
-    }
-
-
-    class OnlineVideoAdapter extends RecyclerView.Adapter<OnlineVideoAdapter.ViewHolder> {
-
-        private Context mContext;
-        private ArrayList<VideoData> mVideoDatas;
-        private int TYPE_FOOTER = 100;
-        private int TYPE_ITEM = 101;
-
-        public OnlineVideoAdapter(Context context) {
-            mContext = context;
-        }
-
-        public void notifyDataChange(ArrayList<VideoData> videoDatas) {
-            mVideoDatas = videoDatas;
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.online_view_item_layout, null);
-                return new ViewHolder(view, viewType);
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
-
-            if (holder.mViewType == TYPE_ITEM) {
-                if (mVideoDatas != null && position < mVideoDatas.size()) {
-                    VideoData videoData = mVideoDatas.get(position);
-                    ImageUtil.loadLoalImage(mContext, videoData.getThumbPath(), 200, 200, holder.mVideoImage, 10);
-                    holder.mVideoTitle.setText(videoData.getName());
-                }
-            } else {
-                holder.mVideoTitle.setText("上拉加载更多...");
-            }
-        }
-
-        @Override
-        public int getItemViewType(int position) {
-            if (position +1 == getItemCount()) {
-                return TYPE_FOOTER;
-            } else {
-                return TYPE_ITEM;
-            }
-        }
-
-        @Override
-        public int getItemCount() {
-            return mVideoDatas != null ? mVideoDatas.size() : 0;
-        }
-
-        class ViewHolder extends RecyclerView.ViewHolder {
-            @BindView(R.id.video_image)
-            ImageView mVideoImage;
-            @BindView(R.id.video_title)
-            TextView mVideoTitle;
-
-            public int mViewType;
-
-            ViewHolder(View view, int viewType) {
-                super(view);
-                ButterKnife.bind(this, view);
-                mViewType = viewType;
-            }
-        }
     }
 }

@@ -209,7 +209,7 @@ public class LocalVideoFragment extends ListFragment implements VideoContract.Vi
 //            viewHolder.thumbnail.setImageBitmap(videoData.getThumbnail());
 
 
-            ImageUtil.loadLoalImage(mContext, videoData.thumbPath, mHeight, mWidth, viewHolder.thumbnail, 0);
+            ImageUtil.loadLoalImage(mContext, videoData.thumbPath, mHeight, mWidth, viewHolder.thumbnail, 10);
 
             return convertView;
         }
