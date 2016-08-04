@@ -41,6 +41,6 @@ public class VideoUtils {
 
     public static int getPlayerType(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("tanjinc", Context.MODE_PRIVATE);
-        return sharedPreferences.getInt("video_player_type", 0);
+        return sharedPreferences.getInt("video_player_type", 1);
     }
 }

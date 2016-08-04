@@ -30,7 +30,7 @@
         android:id="@+id/bottom_layout"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         android:background="@drawable/bottom_bg">
         <ImageButton
             android:id="@+id/play"
@@ -39,6 +39,7 @@
             android:paddingLeft="10dp"
             android:layout_centerVertical="true"
             android:background="@drawable/play"/>
+
 
         <LinearLayout
             android:orientation="horizontal"
@@ -76,7 +77,16 @@
             android:layout_alignParentRight="true"/>
 
 
+
     </RelativeLayout>
+    <EditText
+        android:id="@+id/edit_danmu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="hello world"
+        android:layout_alignParentTop="true"
+        android:visibility="visible"/>
+
 
     <!--<com.tanjinc.tmediaplayer.widgets.PlayerMenuWidget-->
         <!--android:id="@+id/menu_widget"-->

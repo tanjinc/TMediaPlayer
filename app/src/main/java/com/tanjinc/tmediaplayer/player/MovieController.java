@@ -8,7 +8,9 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -52,6 +54,8 @@ public class MovieController extends RelativeLayout implements IController {
     Button mPlayerMenuBtn;
     @BindView(R.id.bottom_layout)
     RelativeLayout mBottomLayout;
+    @BindView(R.id.edit_danmu)
+    EditText mEditText;
 
     private Context mContext;
     private boolean mIsShowing;
@@ -83,15 +87,22 @@ public class MovieController extends RelativeLayout implements IController {
                 }
                 break;
             case R.id.player_menu_btn:
-                if (mPlayerMenuWidget.isShown()) {
-                    mPlayerMenuWidget.hideWithAnim(true);
-                } else {
-                    mPlayerMenuWidget.showWithAnim(true);
-                }
+//                if (mPlayerMenuWidget.isShown()) {
+//                    mPlayerMenuWidget.hideWithAnim(true);
+//                } else {
+//                    mPlayerMenuWidget.showWithAnim(true);
+//                }
+                showDanmu();
                 break;
         }
     }
 
+
+    private void showDanmu() {
+        InputMethodManager methodManager = (InputMethodManager) mContext.getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        methodManager.toggleSoftInput(0,0);
+        mEditText.requestFocus();
+    }
     private enum PlayState {
 
     }
@@ -141,10 +152,10 @@ public class MovieController extends RelativeLayout implements IController {
         mPlayerMenuWidget.setMenuData(menuData);
         mPlayerMenuWidget.hideWithAnim(false);
 
-        mShareWidget = new ShareWidget(mContext);
-        addView(mShareWidget);
-        mShareWidget.resetLayout(mIsHorizontal);
-        mWidgets.add(mShareWidget);
+//        mShareWidget = new ShareWidget(mContext);
+//        addView(mShareWidget);
+//        mShareWidget.resetLayout(mIsHorizontal);
+//        mWidgets.add(mShareWidget);
 
 
     }

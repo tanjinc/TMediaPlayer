@@ -1,14 +1,21 @@
 package com.tanjinc.tmediaplayer.player;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.PixelFormat;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Display;
+import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -29,6 +36,7 @@ public class VideoPlayActivity extends AppCompatActivity{
     private MoviePlayer mPlayer;
     private FrameLayout mRoot;
     private Uri mUri;
+    private boolean sIsFloatWindow = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,11 +44,28 @@ public class VideoPlayActivity extends AppCompatActivity{
         setContentView(R.layout.player_root);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 //        getWindow().addFlags(Window.FEATURE_ACTION_BAR_OVERLAY); //导致ANR
-        mRoot = (FrameLayout) findViewById(R.id.root);
-        mPlayer = new MoviePlayer(this);
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        mRoot.addView(mPlayer, lp);
-        mPlayer.setUrl(getDataFromIntent(getIntent()));
+////        mRoot = (FrameLayout) findViewById(R.id.root);
+//        mRoot = (FrameLayout) LayoutInflater.from(this).inflate(R.layout.player_root, null);
+//
+//        if (sIsFloatWindow) {
+//            initFloatWindow();
+//        } else {
+//            setContentView(R.layout.player_root);
+//        }
+//
+//        mPlayer = new MoviePlayer(this);
+//        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+//        mRoot.addView(mPlayer, lp);
+//        mPlayer.setUrl(getDataFromIntent(getIntent()));
+
+
+//        requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        Window window = getWindow();
+//        if (window != null) {
+//            window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//        }
+        VideoPlayerService.startServices(this, getIntent());
+//        finish();
     }
 
     private Uri getDataFromIntent(Intent intent) {
@@ -58,18 +83,17 @@ public class VideoPlayActivity extends AppCompatActivity{
     protected void onPause() {
         Log.d(TAG, "onPause");
         super.onPause();
-        mPlayer.onPause();
+//        mPlayer.onPause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mPlayer.onResume();
+//        mPlayer.onResume();
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        Log.e(TAG, "video onKeyDown() called with: " + "keyCode = [" + keyCode + "], event = [" + event + "]");
         return mPlayer != null && mPlayer.onKeyDown(keyCode, event);
     }
 

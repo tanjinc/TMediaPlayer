@@ -46,12 +46,12 @@ public class MoviePlayer extends FrameLayout {
 
     public MoviePlayer(Context context) {
         super(context);
-        mActivity = (Activity)context;
+//        mActivity = (Activity)context;
         mMainHandler = new Handler();
         setBackgroundColor(Color.BLACK);
         // 创建 VideoView
 
-        mVideoView = getPlayer(context, VideoUtils.getPlayerType(mActivity));
+        mVideoView = getPlayer(context, VideoUtils.getPlayerType(getContext()));
         LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.gravity = Gravity.CENTER;
         addView((View) mVideoView, layoutParams);
@@ -63,7 +63,7 @@ public class MoviePlayer extends FrameLayout {
         mVideoView.setCompletelistener(new IVideoView.CompleteListener() {
             @Override
             public void onCompletion() {
-                mActivity.finish();
+//                mActivity.finish();
             }
         });
 
