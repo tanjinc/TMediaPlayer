@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +19,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -26,6 +29,10 @@ import com.sina.weibo.sdk.api.share.BaseResponse;
 import com.sina.weibo.sdk.api.share.IWeiboHandler;
 import com.sina.weibo.sdk.constant.WBConstants;
 import com.tanjinc.tmediaplayer.R;
+import com.tanjinc.tmediaplayer.utils.KeyboardUtil;
+import com.tanjinc.tmediaplayer.utils.ScreenUtil;
+
+import java.util.ArrayList;
 
 /**
  * Created by tanjincheng on 16/2/21.
@@ -43,7 +50,6 @@ public class VideoPlayActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.player_root);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//        getWindow().addFlags(Window.FEATURE_ACTION_BAR_OVERLAY); //导致ANR
 ////        mRoot = (FrameLayout) findViewById(R.id.root);
 //        mRoot = (FrameLayout) LayoutInflater.from(this).inflate(R.layout.player_root, null);
 //
@@ -66,6 +72,8 @@ public class VideoPlayActivity extends AppCompatActivity{
 //        }
         VideoPlayerService.startServices(this, getIntent());
 //        finish();
+
+        KeyboardUtil.observeSoftKeyboard(this);
     }
 
     private Uri getDataFromIntent(Intent intent) {
@@ -93,8 +101,15 @@ public class VideoPlayActivity extends AppCompatActivity{
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        KeyboardUtil.unObserveSoftKeyboard(this);
+    }
+
+    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         return mPlayer != null && mPlayer.onKeyDown(keyCode, event);
     }
+
 
 }

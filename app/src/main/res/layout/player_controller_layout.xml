@@ -28,10 +28,10 @@
 
     <RelativeLayout
         android:id="@+id/bottom_layout"
-        android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bottom_bg">
+        android:background="@drawable/bottom_bg"
+        android:layout_alignParentBottom="true">
         <ImageButton
             android:id="@+id/play"
             android:layout_width="25dp"
@@ -40,10 +40,22 @@
             android:layout_centerVertical="true"
             android:background="@drawable/play"/>
 
+        <Button
+            android:id="@+id/player_menu_btn"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="弹幕"
+            android:textSize="12sp"
+            android:layout_alignParentRight="true"/>
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_toRightOf="@id/play"
+            android:layout_toLeftOf="@id/player_menu_btn"
+            android:layout_centerVertical="true"
             android:paddingLeft="30dp"
             android:paddingRight="30dp"
             android:layout_width="match_parent"
@@ -70,24 +82,12 @@
                 android:layout_height="wrap_content"/>
         </LinearLayout>
 
-        <Button
-            android:id="@+id/player_menu_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"/>
-
-
 
     </RelativeLayout>
-    <EditText
-        android:id="@+id/edit_danmu"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="hello world"
-        android:layout_alignParentTop="true"
-        android:visibility="visible"/>
 
-
+    <include layout="@layout/layout_danmu_input"
+        android:id="@+id/danmu_layout">
+    </include>
     <!--<com.tanjinc.tmediaplayer.widgets.PlayerMenuWidget-->
         <!--android:id="@+id/menu_widget"-->
         <!--android:layout_width="match_parent"-->

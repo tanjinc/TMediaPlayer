@@ -20,10 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * @author wanghao@SDK
- * @date 2015-01-06  http://redmine.meizu.com/documents/299
- */
+
 public class SDCardHelper extends BroadcastReceiver {
 
     private static SDCardHelper sInstance = null;

@@ -59,13 +59,6 @@ public class VideoPlayerService extends Service {
         Log.d(TAG, "initFloatWindow: ");
         WindowManager windowManager = (WindowManager) getApplication().getSystemService(Context.WINDOW_SERVICE);
 
-        Display display = windowManager.getDefaultDisplay();
-        Point size = new Point();
-        display.getRealSize(size);
-        int screenW = size.x;
-        int screenH = size.y;
-
-
         WindowManager.LayoutParams wmParams = new WindowManager.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         wmParams.type = WindowManager.LayoutParams.TYPE_TOAST;
         wmParams.format = PixelFormat.RGBA_8888;
@@ -86,7 +79,7 @@ public class VideoPlayerService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand: ");
-//        initFloatWindow();
+        mPlayer.start();
         return super.onStartCommand(intent, flags, startId);
     }
 

@@ -1,13 +1,17 @@
 package com.tanjinc.tmediaplayer.player;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Rect;
 import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,6 +21,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.tanjinc.tmediaplayer.R;
+import com.tanjinc.tmediaplayer.utils.KeyboardUtil;
+import com.tanjinc.tmediaplayer.utils.ScreenUtil;
 import com.tanjinc.tmediaplayer.widgets.IWidget;
 import com.tanjinc.tmediaplayer.widgets.PlayerMenuWidget;
 import com.tanjinc.tmediaplayer.widgets.ShareWidget;
@@ -54,8 +60,10 @@ public class MovieController extends RelativeLayout implements IController {
     Button mPlayerMenuBtn;
     @BindView(R.id.bottom_layout)
     RelativeLayout mBottomLayout;
-    @BindView(R.id.edit_danmu)
+    @BindView(R.id.danmu_edit)
     EditText mEditText;
+    @BindView(R.id.danmu_layout)
+    RelativeLayout mDanmuInputLayout;
 
     private Context mContext;
     private boolean mIsShowing;
@@ -99,13 +107,9 @@ public class MovieController extends RelativeLayout implements IController {
 
 
     private void showDanmu() {
-        InputMethodManager methodManager = (InputMethodManager) mContext.getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        methodManager.toggleSoftInput(0,0);
-        mEditText.requestFocus();
+        KeyboardUtil.toggleSoftInput(mContext);
     }
-    private enum PlayState {
 
-    }
 
     public MovieController(Context context, IVideoView player) {
         super(context);
@@ -128,8 +132,21 @@ public class MovieController extends RelativeLayout implements IController {
         mSeekbar.setOnSeekBarChangeListener(mSeekBarChangeListener);
         mSeekbar.setThumb(null);
         mShareBtn.setVisibility(GONE);
+        mDanmuInputLayout.setVisibility(GONE);
         addWidgets();
         resetLayout();
+        KeyboardUtil.addSoftKeyboardChangedListener(new KeyboardUtil.OnSoftKeyboardChangeListener() {
+            @Override
+            public void onSoftKeyBoardChange(int softKeybardHeight, boolean visible) {
+                Log.d(TAG, "video onSoftKeyBoardChange() called with: " + "softKeybardHeight = [" + softKeybardHeight + "], visible = [" + visible + "]");
+                RelativeLayout.LayoutParams layoutParams = (LayoutParams) mDanmuInputLayout.getLayoutParams();
+                layoutParams.bottomMargin = softKeybardHeight;
+                layoutParams.addRule(ALIGN_PARENT_BOTTOM);
+                mDanmuInputLayout.setLayoutParams(layoutParams);
+                mDanmuInputLayout.setVisibility(visible ? VISIBLE:GONE);
+                mEditText.requestFocus();
+            }
+        });
     }
 
     private void addWidgets() {
