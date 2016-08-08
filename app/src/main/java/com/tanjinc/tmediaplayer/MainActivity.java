@@ -21,10 +21,9 @@ import android.widget.ListView;
 
 import com.tanjinc.tmediaplayer.data.DoubanMovieDataSource;
 import com.tanjinc.tmediaplayer.data.LocalVideoDataSource;
-import com.tanjinc.tmediaplayer.player.VideoUtils;
+import com.tanjinc.tmediaplayer.utils.VideoUtils;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

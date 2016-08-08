@@ -2,13 +2,14 @@ package com.tanjinc.tmediaplayer.player;
 
 import android.content.Context;
 import android.media.MediaPlayer;
-import android.media.MediaMetadata;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import com.tanjinc.tmediaplayer.utils.VideoUtils;
 
 /**
  * Created by tanjinc on 16-2-22.
@@ -110,7 +111,9 @@ public class MyVideoView extends SurfaceView implements IVideoView{
 
     @Override
     public void pause() {
-        mMediaPlayer.pause();
+        if (mMediaPlayer != null) {
+            mMediaPlayer.pause();
+        }
     }
 
     @Override
@@ -130,7 +133,9 @@ public class MyVideoView extends SurfaceView implements IVideoView{
 
     @Override
     public void seekTo(int pos) {
-        mMediaPlayer.seekTo(pos);
+        if (mMediaPlayer != null) {
+            mMediaPlayer.seekTo(pos);
+        }
     }
 
     @Override
@@ -252,7 +257,6 @@ public class MyVideoView extends SurfaceView implements IVideoView{
             mMediaPlayer.setOnPreparedListener(mOnPrepareListener);
             mMediaPlayer.setDisplay(mSFHolder);
             mMediaPlayer.setDataSource(mContext, mUri, null);
-//            mMediaPlayer.setDataSource(mUri.getPath());
             mMediaPlayer.prepareAsync();
             mCurrentState = VideoUtils.PlayState.STATE_PREPARING;
         } catch (Exception e) {

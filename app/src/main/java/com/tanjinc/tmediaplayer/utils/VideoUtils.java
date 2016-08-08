@@ -1,4 +1,4 @@
-package com.tanjinc.tmediaplayer.player;
+package com.tanjinc.tmediaplayer.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;

@@ -1,46 +1,25 @@
 package com.tanjinc.tmediaplayer.player;
 
-import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.res.Configuration;
-import android.graphics.PixelFormat;
-import android.graphics.Point;
-import android.graphics.Rect;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Display;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
-import com.sina.weibo.sdk.api.share.BaseResponse;
-import com.sina.weibo.sdk.api.share.IWeiboHandler;
-import com.sina.weibo.sdk.constant.WBConstants;
 import com.tanjinc.tmediaplayer.R;
 import com.tanjinc.tmediaplayer.utils.KeyboardUtil;
-import com.tanjinc.tmediaplayer.utils.ScreenUtil;
-
-import java.util.ArrayList;
 
 /**
- * Created by tanjincheng on 16/2/21.
+ * Created by tanjincheng on 16/8/8.
  */
-public class VideoPlayActivity extends AppCompatActivity{
+public class VideoPlayActivity2 extends AppCompatActivity {
     private static final String TAG = "VideoPlayActivity";
 
     private MoviePlayer mPlayer;
@@ -54,9 +33,19 @@ public class VideoPlayActivity extends AppCompatActivity{
         setContentView(R.layout.player_root);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        VideoPlayService.startServices(this, getIntent());
+        mRoot = (FrameLayout) findViewById(R.id.root);
+        mPlayer = new MoviePlayer(this);
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        mRoot.addView(mPlayer, lp);
+        mPlayer.setUrl(getDataFromIntent(getIntent()));
 
         KeyboardUtil.observeSoftKeyboard(this);
+    }
+
+    private Uri getDataFromIntent(Intent intent) {
+        mUri = intent.getData();
+        Log.d(TAG, "video mUri = " + mUri);
+        return mUri;
     }
 
     @Override
@@ -67,37 +56,31 @@ public class VideoPlayActivity extends AppCompatActivity{
     @Override
     protected void onPause() {
         Log.d(TAG, "onPause");
-        if (VideoPlayService.getPlayerServiceHelp() != null) {
-            VideoPlayService.getPlayerServiceHelp().onPause();
-        }
+        mPlayer.onPause();
         super.onPause();
     }
 
     @Override
     protected void onResume() {
-        if (VideoPlayService.getPlayerServiceHelp() != null) {
-            VideoPlayService.getPlayerServiceHelp().onResume();
-        }
+        mPlayer.onResume();
         super.onResume();
     }
 
     @Override
     protected void onStart() {
+        mPlayer.start();
         super.onStart();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mPlayer.suspend();
         KeyboardUtil.unObserveSoftKeyboard(this);
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        Log.d(TAG, "video onKeyDown() called with: " + "keyCode = [" + keyCode + "], event = [" + event + "]");
-        if (VideoPlayService.getPlayerServiceHelp() != null) {
-            VideoPlayService.getPlayerServiceHelp().onKeyDown(keyCode, event);
-        }
         return super.onKeyDown(keyCode, event);
     }
 }

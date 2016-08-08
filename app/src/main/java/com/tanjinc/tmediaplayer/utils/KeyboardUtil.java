@@ -18,7 +18,7 @@ public class KeyboardUtil {
     private static final String TAG = "KeyboardUtil";
 
     private static ViewTreeObserver.OnGlobalLayoutListener mOnGlobalLayoutListener;
-    private static ArrayList<OnSoftKeyboardChangeListener> mOnSoftKeyBoardChangeListenerArray = new ArrayList<>();
+    private final static ArrayList<OnSoftKeyboardChangeListener> mOnSoftKeyBoardChangeListenerArray = new ArrayList<>();
 
     public static void observeSoftKeyboard(Activity activity) {
         if (activity == null) {
@@ -69,6 +69,7 @@ public class KeyboardUtil {
     public static void addSoftKeyboardChangedListener(OnSoftKeyboardChangeListener listener) {
         if (listener != null) {
             mOnSoftKeyBoardChangeListenerArray.add(listener);
+            Log.d(TAG, "video addSoftKeyboardChangedListener: size=" + mOnSoftKeyBoardChangeListenerArray.size());
         }
     }
 
@@ -79,6 +80,8 @@ public class KeyboardUtil {
     public static void removeSoftKeyboardChangedListener(OnSoftKeyboardChangeListener listener) {
         if (listener != null) {
             mOnSoftKeyBoardChangeListenerArray.remove(listener);
+            Log.d(TAG, "video removeSoftKeyboardChangedListener: size=" + mOnSoftKeyBoardChangeListenerArray.size());
+
         }
     }
 

@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.tanjinc.tmediaplayer.data.VideoData;
 import com.tanjinc.tmediaplayer.player.VideoPlayActivity;
+import com.tanjinc.tmediaplayer.player.VideoPlayActivity2;
 import com.tanjinc.tmediaplayer.utils.ImageUtil;
 import com.tanjinc.tmediaplayer.utils.SDCardHelper;
 
@@ -44,6 +45,7 @@ public class LocalVideoFragment extends ListFragment implements VideoContract.Vi
 
     private VideoContract.Presenter mPresenter;
 
+    private boolean mIsFloatPlay = true;    //是否悬浮播放
 
 
     @Override
@@ -101,7 +103,8 @@ public class LocalVideoFragment extends ListFragment implements VideoContract.Vi
     }
 
     private void startVideoPlayerActivity(Uri uri) {
-        Intent intent = new Intent(getActivity(), VideoPlayActivity.class);
+        Intent intent = new Intent();
+        intent.setClass(getActivity(), mIsFloatPlay ? VideoPlayActivity.class : VideoPlayActivity2.class);
         intent.setData(uri);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);

@@ -1,18 +1,16 @@
 package com.tanjinc.tmediaplayer.player;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Rect;
 import android.os.Handler;
+import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewTreeObserver;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -22,7 +20,7 @@ import android.widget.TextView;
 
 import com.tanjinc.tmediaplayer.R;
 import com.tanjinc.tmediaplayer.utils.KeyboardUtil;
-import com.tanjinc.tmediaplayer.utils.ScreenUtil;
+import com.tanjinc.tmediaplayer.utils.VideoUtils;
 import com.tanjinc.tmediaplayer.widgets.IWidget;
 import com.tanjinc.tmediaplayer.widgets.PlayerMenuWidget;
 import com.tanjinc.tmediaplayer.widgets.ShareWidget;
@@ -41,6 +39,7 @@ public class MovieController extends RelativeLayout implements IController {
 
     private static final int SEEK_BAR_MAX = 10000;
     private static final String TAG = "MovieController";
+    private static final int MSG_SHOW_DANMU_INPUT = 1001;
 
     @BindView(R.id.title)
     TextView mTitle;
@@ -70,6 +69,7 @@ public class MovieController extends RelativeLayout implements IController {
     private IVideoView mPlayer;
 
 
+    private int mDanmuInputMargin;
     private boolean mIsHorizontal;
     //widget
     private PlayerMenuWidget mPlayerMenuWidget;
@@ -138,13 +138,19 @@ public class MovieController extends RelativeLayout implements IController {
         KeyboardUtil.addSoftKeyboardChangedListener(new KeyboardUtil.OnSoftKeyboardChangeListener() {
             @Override
             public void onSoftKeyBoardChange(int softKeybardHeight, boolean visible) {
-                Log.d(TAG, "video onSoftKeyBoardChange() called with: " + "softKeybardHeight = [" + softKeybardHeight + "], visible = [" + visible + "]");
-                RelativeLayout.LayoutParams layoutParams = (LayoutParams) mDanmuInputLayout.getLayoutParams();
-                layoutParams.bottomMargin = softKeybardHeight;
-                layoutParams.addRule(ALIGN_PARENT_BOTTOM);
-                mDanmuInputLayout.setLayoutParams(layoutParams);
-                mDanmuInputLayout.setVisibility(visible ? VISIBLE:GONE);
-                mEditText.requestFocus();
+                if (visible) {
+                    mHandler.sendEmptyMessageDelayed(MSG_SHOW_DANMU_INPUT, 100);
+                    if (mDanmuInputMargin != softKeybardHeight) {
+                        mDanmuInputMargin = softKeybardHeight;
+                        RelativeLayout.LayoutParams layoutParams = (LayoutParams) mDanmuInputLayout.getLayoutParams();
+                        layoutParams.bottomMargin = softKeybardHeight;
+                        layoutParams.addRule(ALIGN_PARENT_BOTTOM);
+                        mDanmuInputLayout.setLayoutParams(layoutParams);
+                    }
+
+                } else {
+                    mDanmuInputLayout.setVisibility(GONE);
+                }
             }
         });
     }
@@ -202,7 +208,19 @@ public class MovieController extends RelativeLayout implements IController {
     };
 
 
-    private Handler mHandler = new Handler();
+    private Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_SHOW_DANMU_INPUT:
+                    mDanmuInputLayout.setVisibility(VISIBLE);
+                    mEditText.requestFocus();
+                    break;
+                default:
+                    super.handleMessage(msg);
+            }
+        }
+    };
     private Runnable progressRunnable = new Runnable() {
         @Override
         public void run() {
@@ -299,5 +317,11 @@ public class MovieController extends RelativeLayout implements IController {
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         mShareWidget.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        Log.d(TAG, "video onKeyDown() called with: " + "keyCode = [" + keyCode + "], event = [" + event + "]");
+        return super.onKeyDown(keyCode, event);
     }
 }

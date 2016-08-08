@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
         android:allowBackup="true"
@@ -36,6 +37,10 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".player.VideoPlayActivity2">
+
+        </activity>
+
         <activity
             android:name="com.sina.weibo.sdk.component.WeiboSdkBrowser"
                   android:configChanges="keyboardHidden|orientation"
@@ -54,7 +59,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".player.VideoPlayerService"/>
+        <service android:name=".player.VideoPlayService"/>
 
     </application>
 
