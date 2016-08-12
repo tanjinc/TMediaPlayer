@@ -41,9 +41,7 @@ public class KeyboardUtil {
                         mOnSoftKeyBoardChangeListenerArray.get(i).onSoftKeyBoardChange(keyboardHeight, !hide);
                     }
                 }
-
                 previousKeyboardHeight = height;
-
             }
         };
         decorView.getViewTreeObserver().addOnGlobalLayoutListener(mOnGlobalLayoutListener);
@@ -56,6 +54,7 @@ public class KeyboardUtil {
         }
         activity.getWindow().getDecorView().getViewTreeObserver().removeOnGlobalLayoutListener(mOnGlobalLayoutListener);
         mOnSoftKeyBoardChangeListenerArray.clear();
+        mOnGlobalLayoutListener = null;
     }
 
     public interface OnSoftKeyboardChangeListener {

@@ -9,7 +9,7 @@
         android:layout_alignParentTop="true"
         android:layout_width="match_parent"
         android:background="@drawable/top_bg"
-        android:layout_height="30dp">
+        android:layout_height="wrap_content">
         <TextView
             android:id="@+id/title"
             android:layout_centerVertical="true"
@@ -24,7 +24,15 @@
             android:layout_alignParentRight="true"
             android:text="share"/>
 
+
+        <com.tanjinc.tmediaplayer.widgets.TimeAndPowerView
+            android:id="@+id/time_power_view"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"></com.tanjinc.tmediaplayer.widgets.TimeAndPowerView>
+
     </RelativeLayout>
+
 
     <RelativeLayout
         android:id="@+id/bottom_layout"

@@ -59,13 +59,15 @@ public class VideoPlayService extends Service implements IPlayerServiceHelp{
         mRoot.addView(mPlayer, lp);
         mPlayer.setUrl(mUri);
 
-        KeyboardUtil.addSoftKeyboardChangedListener(new KeyboardUtil.OnSoftKeyboardChangeListener() {
-            @Override
-            public void onSoftKeyBoardChange(int softKeybardHeight, boolean visible) {
-                setEnableInput(visible);
-            }
-        });
+        KeyboardUtil.addSoftKeyboardChangedListener(mSoftKeyboardChangeListener);
     }
+
+    private KeyboardUtil.OnSoftKeyboardChangeListener mSoftKeyboardChangeListener = new KeyboardUtil.OnSoftKeyboardChangeListener() {
+        @Override
+        public void onSoftKeyBoardChange(int softKeybardHeight, boolean visible) {
+            setEnableInput(visible);
+        }
+    };
 
 
     public static IPlayerServiceHelp getPlayerServiceHelp() {
@@ -121,6 +123,7 @@ public class VideoPlayService extends Service implements IPlayerServiceHelp{
 
     @Override
     public void onDestroy() {
+        KeyboardUtil.removeSoftKeyboardChangedListener(mSoftKeyboardChangeListener);
         super.onDestroy();
     }
 

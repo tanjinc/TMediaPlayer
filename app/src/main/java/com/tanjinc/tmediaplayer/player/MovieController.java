@@ -24,6 +24,7 @@ import com.tanjinc.tmediaplayer.utils.VideoUtils;
 import com.tanjinc.tmediaplayer.widgets.IWidget;
 import com.tanjinc.tmediaplayer.widgets.PlayerMenuWidget;
 import com.tanjinc.tmediaplayer.widgets.ShareWidget;
+import com.tanjinc.tmediaplayer.widgets.TimeAndPowerView;
 
 import java.util.ArrayList;
 
@@ -63,6 +64,9 @@ public class MovieController extends RelativeLayout implements IController {
     EditText mEditText;
     @BindView(R.id.danmu_layout)
     RelativeLayout mDanmuInputLayout;
+
+    @BindView(R.id.time_power_view)
+    TimeAndPowerView mTimeAndPowerView;
 
     private Context mContext;
     private boolean mIsShowing;
@@ -135,26 +139,30 @@ public class MovieController extends RelativeLayout implements IController {
         mDanmuInputLayout.setVisibility(GONE);
         addWidgets();
         resetLayout();
-        KeyboardUtil.addSoftKeyboardChangedListener(new KeyboardUtil.OnSoftKeyboardChangeListener() {
-            @Override
-            public void onSoftKeyBoardChange(int softKeybardHeight, boolean visible) {
-                if (visible) {
-                    mHandler.sendEmptyMessageDelayed(MSG_SHOW_DANMU_INPUT, 100);
-                    if (mDanmuInputMargin != softKeybardHeight) {
-                        mDanmuInputMargin = softKeybardHeight;
-                        RelativeLayout.LayoutParams layoutParams = (LayoutParams) mDanmuInputLayout.getLayoutParams();
-                        layoutParams.bottomMargin = softKeybardHeight;
-                        layoutParams.addRule(ALIGN_PARENT_BOTTOM);
-                        mDanmuInputLayout.setLayoutParams(layoutParams);
-                    }
-
-                } else {
-                    mDanmuInputLayout.setVisibility(GONE);
-                }
-            }
-        });
+        KeyboardUtil.addSoftKeyboardChangedListener(mSoftKeyboardChangeListener);
     }
 
+    
+    private KeyboardUtil.OnSoftKeyboardChangeListener mSoftKeyboardChangeListener = new KeyboardUtil.OnSoftKeyboardChangeListener() {
+        @Override
+        public void onSoftKeyBoardChange(int softKeybardHeight, boolean visible) {
+            Log.d(TAG, "video onSoftKeyBoardChange() called with: " + "softKeybardHeight = [" + softKeybardHeight + "], visible = [" + visible + "]");
+            if (visible) {
+                mHandler.sendEmptyMessageDelayed(MSG_SHOW_DANMU_INPUT, 100);
+                if (mDanmuInputMargin != softKeybardHeight) {
+                    mDanmuInputMargin = softKeybardHeight;
+                    RelativeLayout.LayoutParams layoutParams = (LayoutParams) mDanmuInputLayout.getLayoutParams();
+                    layoutParams.bottomMargin = softKeybardHeight;
+                    layoutParams.addRule(ALIGN_PARENT_BOTTOM);
+                    mDanmuInputLayout.setLayoutParams(layoutParams);
+                }
+                mEditText.requestFocus();
+            } else {
+                mDanmuInputLayout.setVisibility(GONE);
+            }
+        }
+    };
+    
     private void addWidgets() {
         mPlayerMenuWidget = new PlayerMenuWidget(mContext);
         addView(mPlayerMenuWidget);
@@ -254,6 +262,7 @@ public class MovieController extends RelativeLayout implements IController {
     public void showController() {
         mBottomLayout.setVisibility(VISIBLE);
         mTopLayout.setVisibility(VISIBLE);
+        mTimeAndPowerView.star();
         mIsShowing = true;
     }
 
@@ -261,6 +270,7 @@ public class MovieController extends RelativeLayout implements IController {
     public void hideController() {
         mBottomLayout.setVisibility(GONE);
         mTopLayout.setVisibility(GONE);
+        mTimeAndPowerView.stop();
         mIsShowing = false;
     }
 
@@ -323,5 +333,12 @@ public class MovieController extends RelativeLayout implements IController {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         Log.d(TAG, "video onKeyDown() called with: " + "keyCode = [" + keyCode + "], event = [" + event + "]");
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        Log.d(TAG, "video onDetachedFromWindow: ");
+        KeyboardUtil.removeSoftKeyboardChangedListener(mSoftKeyboardChangeListener);
+        super.onDetachedFromWindow();
     }
 }

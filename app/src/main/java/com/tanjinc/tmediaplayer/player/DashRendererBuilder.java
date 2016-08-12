@@ -88,21 +88,21 @@ public class DashRendererBuilder implements RendererBuilder {
     this.url = url;
   }
 
-  private final MediaDrmCallback drmCallback = new MediaDrmCallback() {
-    @Override
-    public byte[] executeProvisionRequest(UUID uuid, MediaDrm.ProvisionRequest request) throws Exception {
-      return new byte[0];
-    }
-
-    @Override
-    public byte[] executeKeyRequest(UUID uuid, MediaDrm.KeyRequest request) throws Exception {
-      return new byte[0];
-    }
-  };
+//  private final MediaDrmCallback drmCallback = new MediaDrmCallback() {
+//    @Override
+//    public byte[] executeProvisionRequest(UUID uuid, MediaDrm.ProvisionRequest request) throws Exception {
+//      return new byte[0];
+//    }
+//
+//    @Override
+//    public byte[] executeKeyRequest(UUID uuid, MediaDrm.KeyRequest request) throws Exception {
+//      return new byte[0];
+//    }
+//  };
 
   @Override
   public void buildRenderers(ExoVideoView player) {
-    currentAsyncBuilder = new AsyncRendererBuilder(context, userAgent, url, drmCallback, player);
+//    currentAsyncBuilder = new AsyncRendererBuilder(context, userAgent, url, drmCallback, player);
     currentAsyncBuilder.init();
   }
 
