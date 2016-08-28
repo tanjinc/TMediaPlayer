@@ -25,7 +25,6 @@ public class VideoPlayActivity2 extends AppCompatActivity {
     private MoviePlayer mPlayer;
     private FrameLayout mRoot;
     private Uri mUri;
-    private boolean sIsFloatWindow = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

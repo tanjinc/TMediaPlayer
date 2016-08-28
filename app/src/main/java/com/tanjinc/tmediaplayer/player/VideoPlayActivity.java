@@ -1,9 +1,11 @@
 package com.tanjinc.tmediaplayer.player;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
@@ -43,10 +45,13 @@ import java.util.ArrayList;
 public class VideoPlayActivity extends AppCompatActivity{
     private static final String TAG = "VideoPlayActivity";
 
+    public static final String ACTION_CLOSE_SELF = "com.tanjinc.tmediaplayer.action_close_self";
     private MoviePlayer mPlayer;
     private FrameLayout mRoot;
     private Uri mUri;
     private boolean sIsFloatWindow = true;
+    private boolean mIsSwithchToFloat = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +62,24 @@ public class VideoPlayActivity extends AppCompatActivity{
         VideoPlayService.startServices(this, getIntent());
 
         KeyboardUtil.observeSoftKeyboard(this);
+
+        IntentFilter intentFilter = new IntentFilter(ACTION_CLOSE_SELF);
+        registerReceiver(mBroadcastReceiver, intentFilter);
     }
+
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case ACTION_CLOSE_SELF:
+                    mIsSwithchToFloat = true;
+                    finish();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -67,7 +89,7 @@ public class VideoPlayActivity extends AppCompatActivity{
     @Override
     protected void onPause() {
         Log.d(TAG, "onPause");
-        if (VideoPlayService.getPlayerServiceHelp() != null) {
+        if (VideoPlayService.getPlayerServiceHelp() != null && !mIsSwithchToFloat) {
             VideoPlayService.getPlayerServiceHelp().onPause();
         }
         super.onPause();
@@ -75,7 +97,7 @@ public class VideoPlayActivity extends AppCompatActivity{
 
     @Override
     protected void onResume() {
-        if (VideoPlayService.getPlayerServiceHelp() != null) {
+        if (VideoPlayService.getPlayerServiceHelp() != null && !mIsSwithchToFloat) {
             VideoPlayService.getPlayerServiceHelp().onResume();
         }
         super.onResume();
@@ -89,6 +111,7 @@ public class VideoPlayActivity extends AppCompatActivity{
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(mBroadcastReceiver);
         KeyboardUtil.unObserveSoftKeyboard(this);
     }
 

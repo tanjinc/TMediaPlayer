@@ -92,7 +92,7 @@ public class TimeAndPowerView extends LinearLayout{
 
     private String getTime() {
         String ret =  DateUtils.formatDateTime(mContext, System.currentTimeMillis(), DateUtils.FORMAT_SHOW_TIME);
-        Log.d(TAG, "video getTime: " + ret);
+//        Log.d(TAG, "video getTime: " + ret);
         return ret;
     }
 

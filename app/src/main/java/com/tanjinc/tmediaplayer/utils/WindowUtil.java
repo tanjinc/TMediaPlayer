@@ -62,6 +62,13 @@ public class WindowUtil {
         }
     }
 
+    public void changeWindowSize(int width, int height, int x, int y) {
+        mParams.width = width;
+        mParams.height = height;
+        mParams.x = x;
+        mParams.y = y;
+        mWindowManager.updateViewLayout(mView, mParams);
+    }
 
     /**
      *

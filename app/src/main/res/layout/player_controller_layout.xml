@@ -96,6 +96,17 @@
     <include layout="@layout/layout_danmu_input"
         android:id="@+id/danmu_layout">
     </include>
+
+    <ImageView
+        android:id="@+id/switch_float_btn"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:background="#994466"
+        android:visibility="gone"
+        />
+
     <!--<com.tanjinc.tmediaplayer.widgets.PlayerMenuWidget-->
         <!--android:id="@+id/menu_widget"-->
         <!--android:layout_width="match_parent"-->

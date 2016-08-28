@@ -14,13 +14,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.tanjinc.tmediaplayer.R;
+import com.tanjinc.tmediaplayer.utils.AnimaUtils;
 import com.tanjinc.tmediaplayer.utils.KeyboardUtil;
 import com.tanjinc.tmediaplayer.utils.VideoUtils;
+import com.tanjinc.tmediaplayer.utils.WindowUtil;
 import com.tanjinc.tmediaplayer.widgets.IWidget;
 import com.tanjinc.tmediaplayer.widgets.PlayerMenuWidget;
 import com.tanjinc.tmediaplayer.widgets.ShareWidget;
@@ -67,6 +70,9 @@ public class MovieController extends RelativeLayout implements IController {
 
     @BindView(R.id.time_power_view)
     TimeAndPowerView mTimeAndPowerView;
+    
+    @BindView(R.id.switch_float_btn)
+    ImageView mSwitchBtn;
 
     private Context mContext;
     private boolean mIsShowing;
@@ -81,7 +87,7 @@ public class MovieController extends RelativeLayout implements IController {
 
     private ArrayList<IWidget> mWidgets = new ArrayList<>();
 
-    @OnClick({R.id.share_btn, R.id.play, R.id.player_menu_btn})
+    @OnClick({R.id.share_btn, R.id.play, R.id.player_menu_btn, R.id.switch_float_btn})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.share_btn:
@@ -99,13 +105,21 @@ public class MovieController extends RelativeLayout implements IController {
                 }
                 break;
             case R.id.player_menu_btn:
-//                if (mPlayerMenuWidget.isShown()) {
-//                    mPlayerMenuWidget.hideWithAnim(true);
-//                } else {
-//                    mPlayerMenuWidget.showWithAnim(true);
-//                }
-                showDanmu();
+                if (mPlayerMenuWidget.isShown()) {
+                    showController();
+                    mPlayerMenuWidget.hideWithAnim(true);
+                } else {
+                    hideController();
+                    mPlayerMenuWidget.showWithAnim(true);
+                }
+//                showDanmu();
                 break;
+            case R.id.switch_float_btn:
+                Log.d(TAG, "video onClick: ");
+                WindowUtil.getInstance().changeWindowSize(300, 200, 10, 10);
+                mContext.sendBroadcast(new Intent(VideoPlayActivity.ACTION_CLOSE_SELF));
+                break;
+            
         }
     }
 
@@ -260,16 +274,20 @@ public class MovieController extends RelativeLayout implements IController {
 
     @Override
     public void showController() {
-        mBottomLayout.setVisibility(VISIBLE);
-        mTopLayout.setVisibility(VISIBLE);
+        Log.d(TAG, "video showController: ");
+        AnimaUtils.showControllerTranslate(mTopLayout, true);
+        AnimaUtils.showControllerTranslate(mBottomLayout, false);
+        AnimaUtils.setMask(this, true);
         mTimeAndPowerView.star();
         mIsShowing = true;
     }
 
     @Override
     public void hideController() {
-        mBottomLayout.setVisibility(GONE);
-        mTopLayout.setVisibility(GONE);
+        Log.d(TAG, "video hideController: ");
+        AnimaUtils.hideControllerTranslate(mTopLayout, true);
+        AnimaUtils.hideControllerTranslate(mBottomLayout, false);
+        AnimaUtils.setMask(this, false);
         mTimeAndPowerView.stop();
         mIsShowing = false;
     }
@@ -302,14 +320,7 @@ public class MovieController extends RelativeLayout implements IController {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-//        if (mPlayerMenuWidget.isShown()) {
-//            mPlayerMenuWidget.hideWithAnim(true);
-//            return false;
-//        }
-
-        for (IWidget i : mWidgets) {
-            i.hideWithAnim(true);
-        }
+        Log.d(TAG, "video onTouchEvent: ");
         if (mIsShowing) {
             hideController();
         } else {

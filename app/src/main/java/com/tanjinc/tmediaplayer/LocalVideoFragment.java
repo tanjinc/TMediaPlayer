@@ -7,7 +7,6 @@ import android.os.Bundle;
 //import android.app.ListFragment;
 import android.os.Handler;
 import android.support.v4.app.ListFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,16 +20,8 @@ import com.tanjinc.tmediaplayer.data.VideoData;
 import com.tanjinc.tmediaplayer.player.VideoPlayActivity;
 import com.tanjinc.tmediaplayer.player.VideoPlayActivity2;
 import com.tanjinc.tmediaplayer.utils.ImageUtil;
-import com.tanjinc.tmediaplayer.utils.SDCardHelper;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by tanjincheng on 16/2/20.
@@ -45,7 +36,7 @@ public class LocalVideoFragment extends ListFragment implements VideoContract.Vi
 
     private VideoContract.Presenter mPresenter;
 
-    private boolean mIsFloatPlay = true;    //是否悬浮播放
+    private boolean mIsFloatPlay = false;    //是否悬浮播放
 
 
     @Override
@@ -83,7 +74,7 @@ public class LocalVideoFragment extends ListFragment implements VideoContract.Vi
 //                intent.setDataAndType(uri, "video/*");
 //                intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 //                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-////                intent.setClassName("com.meizu.media.video", ".player.ui.VideoWindowActivity");
+//                intent.setClassName("com.meizu.media.video", "player.ui.VideoWindowActivity");
 //                startActivity(intent);
 
 //                SDCardHelper.createInstance(mContext);
@@ -108,6 +99,7 @@ public class LocalVideoFragment extends ListFragment implements VideoContract.Vi
         intent.setData(uri);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+//        VideoPlayerHelper.startActivity(getContext(), intent);
     }
 
     private void addTest(ArrayList list) {
@@ -208,9 +200,6 @@ public class LocalVideoFragment extends ListFragment implements VideoContract.Vi
             VideoData videoData = (VideoData) getItem(position);
             viewHolder.displayName.setText(videoData.getName());
             viewHolder.path.setText(videoData.getPath());
-//        viewHolder.path.setText("fadf");
-//            viewHolder.thumbnail.setImageBitmap(videoData.getThumbnail());
-
 
             ImageUtil.loadLoalImage(mContext, videoData.thumbPath, mHeight, mWidth, viewHolder.thumbnail, 10);
 
