@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -20,23 +21,22 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.tanjinc.tmediaplayer.R;
+import com.tanjinc.tmediaplayer.utils.ScreenUtil;
 
 /**
  * Created by tanjincheng on 16/5/14.
  */
-public class ShareWidget extends FrameLayout implements IWidget {
+public class ShareWidget extends BaseWidget{
 
     private static final String TAG = "ShareWidget";
-    private int mScreenWidth;
-    private int mScreenHeight;
     private Context mContext;
     private boolean mIsHorizion;
     private TextView mWeiboBtn;
-    private LinearLayout mRoot;
 
     private WBShareView mWBShareView;
     private WXShareView mWXShareView;
     private WXShareView mWXSceneTimelineView;
+    private LinearLayout mRootView;
 
 
     public ShareWidget(Context context) {
@@ -48,10 +48,8 @@ public class ShareWidget extends FrameLayout implements IWidget {
 
 
     public void initView() {
-        LayoutInflater.from(mContext).inflate(R.layout.share_widget_layout,this);
-        mRoot = (LinearLayout) findViewById(R.id.share_item_container);
-
-        mWBShareView = (WBShareView) findViewById(R.id.weibo_view);
+        mRootView = (LinearLayout) LayoutInflater.from(mContext).inflate(R.layout.share_widget_layout,null);
+        mWBShareView = (WBShareView) mRootView.findViewById(R.id.weibo_view);
         mWBShareView.initView((Activity) mContext);
         mWBShareView.setOnClickListener(new OnClickListener() {
             @Override
@@ -60,7 +58,7 @@ public class ShareWidget extends FrameLayout implements IWidget {
             }
         });
 
-        mWXShareView = (WXShareView) findViewById(R.id.wx_view);
+        mWXShareView = (WXShareView) mRootView.findViewById(R.id.wx_view);
         mWXShareView.initView((Activity) mContext);
         mWXShareView.setFocusable(true);
         mWXShareView.setOnClickListener(new OnClickListener() {
@@ -70,7 +68,7 @@ public class ShareWidget extends FrameLayout implements IWidget {
             }
         });
 
-        mWXSceneTimelineView = (WXShareView) findViewById(R.id.wx_timeline);
+        mWXSceneTimelineView = (WXShareView) mRootView.findViewById(R.id.wx_timeline);
         mWXSceneTimelineView.initView((Activity) mContext);
         mWXSceneTimelineView.setOnClickListener(new OnClickListener() {
             @Override
@@ -79,98 +77,29 @@ public class ShareWidget extends FrameLayout implements IWidget {
             }
         });
 
+        setChildView(mRootView);
     }
-
-    @Override
-    public void showWithAnim(boolean anim) {
-        if (anim) {
-            ObjectAnimator transAnim = null;
-            Log.e(TAG, "show ()=" + getTop() +" "+getBottom()+" "+getRight()+ " "+getLeft());
-            if (mIsHorizion) {
-                setTranslationY(0);
-                transAnim = ObjectAnimator.ofFloat(this, "translationX", getWidth(), 0);
-            } else {
-                setTranslationX(0);
-                transAnim = ObjectAnimator.ofFloat(this, "translationY", getHeight(), 0);
-            }
-            transAnim.setDuration(350);
-            transAnim.setInterpolator(PathInterpolatorCompat.create(0.33f, 0f, 0.33f, 1f));
-            transAnim.start();
-            setVisibility(VISIBLE);
-        } else {
-            setVisibility(VISIBLE);
-        }
-    }
-
-    @Override
-    public void hideWithAnim(boolean anim) {
-        if (anim) {
-            ObjectAnimator transAnim = null;
-            if (mIsHorizion) {
-                clearAnimation();
-                transAnim = ObjectAnimator.ofFloat(this, "translationX", 0, getWidth());
-            } else {
-                transAnim = ObjectAnimator.ofFloat(this, "translationY", 0, getHeight());
-            }
-            transAnim.setDuration(300);
-            transAnim.setInterpolator(PathInterpolatorCompat.create(0.33f, 0f, 0.33f, 1f));
-
-            transAnim.addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    setVisibility(GONE);
-                    Log.d(TAG, "hide end ()=" + getTop() + " " + getBottom() + " " + getRight() + " " + getLeft());
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animation) {
-
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animation) {
-
-                }
-            });
-            transAnim.start();
-        } else {
-            setVisibility(INVISIBLE);
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    private void initWindowSize() {
-        WindowManager windowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
-        Display display = windowManager.getDefaultDisplay();
-        Point size = new Point();
-        display.getRealSize(size);
-        mScreenWidth = size.x;
-        mScreenHeight = size.y;
-    }
-
 
     @Override
     public void resetLayout(boolean isHorizion) {
         mIsHorizion = isHorizion;
-        initWindowSize();
-        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) getLayoutParams();
+        RelativeLayout.LayoutParams layoutParams = (LayoutParams) mRootView.getLayoutParams();
         if (isHorizion) {
-            layoutParams.width = mScreenWidth / 2;
+            layoutParams.width = 600;
             layoutParams.height = LayoutParams.MATCH_PARENT;
             layoutParams.rightMargin = 0;
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+            mRootView.setOrientation(LinearLayout.VERTICAL);
+            setAnimaType(FROM.RIGHT);
         } else {
-            layoutParams.height = mScreenHeight / 2;
+            layoutParams.height = 250;
             layoutParams.width = LayoutParams.MATCH_PARENT;
             layoutParams.bottomMargin = 0;
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            mRootView.setOrientation(LinearLayout.HORIZONTAL);
+            setAnimaType(FROM.BOTTOM);
         }
-        setLayoutParams(layoutParams);
+        mRootView.setLayoutParams(layoutParams);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data){

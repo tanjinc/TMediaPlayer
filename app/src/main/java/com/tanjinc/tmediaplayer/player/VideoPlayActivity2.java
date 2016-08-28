@@ -1,6 +1,9 @@
 package com.tanjinc.tmediaplayer.player;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
@@ -80,6 +83,9 @@ public class VideoPlayActivity2 extends AppCompatActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (mPlayer != null) {
+            return mPlayer.onKeyDown(keyCode, event);
+        }
         return super.onKeyDown(keyCode, event);
     }
 }

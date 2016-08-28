@@ -80,7 +80,7 @@ public class MoviePlayer extends FrameLayout {
     public void setUrl(Uri uri) {
         mVideoView.setUri(uri);
         mController.setTitle(mVideoView.getTitle());
-        mController.showController();
+//        mController.showController();
     }
 
     public void suspend() {
@@ -95,6 +95,7 @@ public class MoviePlayer extends FrameLayout {
 
     public void onResume() {
         start();
+        mController.showController();
     }
 
     public void start() {
@@ -104,13 +105,10 @@ public class MoviePlayer extends FrameLayout {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_BACK:
-                mActivity.finish();
-                return true;
-            default:
-                return super.onKeyDown(keyCode, event);
+        if (mController != null) {
+            return mController.onKeyDown(keyCode, event);
         }
+        return super.onKeyDown(keyCode, event);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

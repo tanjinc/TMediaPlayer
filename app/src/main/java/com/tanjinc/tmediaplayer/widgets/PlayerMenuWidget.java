@@ -19,13 +19,16 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.tanjinc.tmediaplayer.LeftMenuAdapter;
 import com.tanjinc.tmediaplayer.R;
@@ -38,7 +41,7 @@ import java.util.ArrayList;
 /**
  * Created by tanjincheng on 16/4/23.
  */
-public class PlayerMenuWidget extends RelativeLayout implements IWidget{
+public class PlayerMenuWidget extends BaseWidget{
     private static final String TAG = "PlayerMenuWidget";
     private static final int HIDE_AUTO = 1;
     private static final int HIDE_AUTO_TIME = 5000;
@@ -84,23 +87,9 @@ public class PlayerMenuWidget extends RelativeLayout implements IWidget{
         initViews(context);
     }
 
-    public PlayerMenuWidget(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        initViews(context);
-    }
-
-    public PlayerMenuWidget(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        initViews(context);
-    }
-
     private void initViews(Context context) {
         mContext = context;
         mRecyclerView = new RecyclerView(context);
-        RelativeLayout.LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        addView(mRecyclerView, layoutParams);
-
         mMenuAdapter = new PlayerMenuAdapter(context);
         mMenuAdapter.setOnItemClickListener(new PlayerMenuAdapter.OnItemClickListener() {
             @Override
@@ -141,8 +130,10 @@ public class PlayerMenuWidget extends RelativeLayout implements IWidget{
         mRecyclerView.setAdapter(mMenuAdapter);
         mLinearLayoutManager = new LinearLayoutManager(context);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
-
         mRecyclerView.setBackgroundColor(getResources().getColor(R.color.player_menu_widget_bg));
+        setVisibility(GONE);
+
+        setChildView(mRecyclerView);
     }
 
     private int getMenuTypeIndex(MENU_ITEM_TYPE type) {
@@ -171,7 +162,7 @@ public class PlayerMenuWidget extends RelativeLayout implements IWidget{
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case HIDE_AUTO:
-                    hideWithAnim(true);
+                    hide();
                     break;
                 default:
                     break;
@@ -184,60 +175,6 @@ public class PlayerMenuWidget extends RelativeLayout implements IWidget{
     }
 
     @Override
-    public void showWithAnim(boolean hasAnim) {
-        mLinearLayoutManager.scrollToPosition(0);
-        if (hasAnim) {
-            ObjectAnimator transAnim = null;
-            Log.e(TAG, "show ()=" + getTop() +" "+getBottom()+" "+getRight()+ " "+getLeft());
-            if (mIsHorizion) {
-                mRecyclerView.setTranslationY(0);
-                transAnim = ObjectAnimator.ofFloat(mRecyclerView, "translationX", getWidth(), 0);
-            } else {
-                mRecyclerView.setTranslationX(0);
-                transAnim = ObjectAnimator.ofFloat(mRecyclerView, "translationY", getHeight(), 0);
-            }
-            transAnim.setDuration(350);
-            transAnim.setInterpolator(PathInterpolatorCompat.create(0.33f, 0f, 0.33f, 1f));
-            transAnim.start();
-            setVisibility(VISIBLE);
-            AnimaUtils.setMask(this, true);
-        } else {
-            setVisibility(VISIBLE);
-        }
-        mHandler.removeMessages(HIDE_AUTO);
-        mHandler.sendEmptyMessageDelayed(HIDE_AUTO, HIDE_AUTO_TIME);
-    }
-
-    @Override
-    public void hideWithAnim(boolean haveAnim) {
-        if (haveAnim) {
-            ObjectAnimator transAnim = null;
-            if (mIsHorizion) {
-                mRecyclerView.clearAnimation();
-                transAnim = ObjectAnimator.ofFloat(mRecyclerView, "translationX", 0, getWidth());
-            } else {
-                transAnim = ObjectAnimator.ofFloat(mRecyclerView, "translationY", 0, getHeight());
-            }
-            transAnim.setDuration(300);
-            transAnim.setInterpolator(PathInterpolatorCompat.create(0.33f, 0f, 0.33f, 1f));
-
-            transAnim.addListener(new AnimatorListenerAdapter() {
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    setVisibility(GONE);
-                }
-
-            });
-            transAnim.start();
-            AnimaUtils.setMask(this, false);
-        } else {
-            setVisibility(INVISIBLE);
-        }
-        mHandler.removeMessages(HIDE_AUTO);
-    }
-
-    @Override
     public void resetLayout(boolean isHorizion) {
         mIsHorizion = isHorizion;
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) mRecyclerView.getLayoutParams();
@@ -247,31 +184,16 @@ public class PlayerMenuWidget extends RelativeLayout implements IWidget{
             layoutParams.topMargin = 0;
             layoutParams.rightMargin = 0;
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+            setAnimaType(FROM.RIGHT);
+
         } else {
             layoutParams.height = ScreenUtil.getScreenHeight(mContext) / 2;
             layoutParams.width = LayoutParams.MATCH_PARENT;
             layoutParams.leftMargin = 0;
             layoutParams.bottomMargin = 0;
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            setAnimaType(FROM.BOTTOM);
         }
         mRecyclerView.setLayoutParams(layoutParams);
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        Log.d(TAG, "video onTouchEvent() called with: " + "event = [" + event + "]");
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                hideWithAnim(true);
-                return true;
-            default:
-                break;
-        }
-        return super.onTouchEvent(event);
-    }
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        return super.dispatchTouchEvent(ev);
     }
 }

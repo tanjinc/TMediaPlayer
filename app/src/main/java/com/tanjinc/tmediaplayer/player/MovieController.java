@@ -1,5 +1,6 @@
 package com.tanjinc.tmediaplayer.player;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -24,7 +25,7 @@ import com.tanjinc.tmediaplayer.utils.AnimaUtils;
 import com.tanjinc.tmediaplayer.utils.KeyboardUtil;
 import com.tanjinc.tmediaplayer.utils.VideoUtils;
 import com.tanjinc.tmediaplayer.utils.WindowUtil;
-import com.tanjinc.tmediaplayer.widgets.IWidget;
+import com.tanjinc.tmediaplayer.widgets.BaseWidget;
 import com.tanjinc.tmediaplayer.widgets.PlayerMenuWidget;
 import com.tanjinc.tmediaplayer.widgets.ShareWidget;
 import com.tanjinc.tmediaplayer.widgets.TimeAndPowerView;
@@ -84,14 +85,13 @@ public class MovieController extends RelativeLayout implements IController {
     //widget
     private PlayerMenuWidget mPlayerMenuWidget;
     private ShareWidget mShareWidget;
-
-    private ArrayList<IWidget> mWidgets = new ArrayList<>();
+    private ArrayList<BaseWidget> mWidgetArray = new ArrayList<>();
 
     @OnClick({R.id.share_btn, R.id.play, R.id.player_menu_btn, R.id.switch_float_btn})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.share_btn:
-                mShareWidget.showWithAnim(true);
+                mShareWidget.show();
                 break;
             case R.id.play:
                 if (mPlayer.isPlaying()) {
@@ -105,14 +105,17 @@ public class MovieController extends RelativeLayout implements IController {
                 }
                 break;
             case R.id.player_menu_btn:
-                if (mPlayerMenuWidget.isShown()) {
-                    showController();
-                    mPlayerMenuWidget.hideWithAnim(true);
-                } else {
-                    hideController();
-                    mPlayerMenuWidget.showWithAnim(true);
-                }
+//                if (mPlayerMenuWidget.isShown()) {
+//                    showController();
+//                    mPlayerMenuWidget.hide();
+//                } else {
+//                    hideController();
+//                    mPlayerMenuWidget.show();
+//                }
 //                showDanmu();
+                mPlayerMenuWidget.show();
+//                mShareWidget.show();
+                hideController();
                 break;
             case R.id.switch_float_btn:
                 Log.d(TAG, "video onClick: ");
@@ -136,11 +139,6 @@ public class MovieController extends RelativeLayout implements IController {
         init();
     }
 
-    public MovieController(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        mContext = context;
-        init();
-    }
 
     private void init() {
         View view = LayoutInflater.from(mContext).inflate(R.layout.player_controller_layout, this);
@@ -160,8 +158,8 @@ public class MovieController extends RelativeLayout implements IController {
     private KeyboardUtil.OnSoftKeyboardChangeListener mSoftKeyboardChangeListener = new KeyboardUtil.OnSoftKeyboardChangeListener() {
         @Override
         public void onSoftKeyBoardChange(int softKeybardHeight, boolean visible) {
-            Log.d(TAG, "video onSoftKeyBoardChange() called with: " + "softKeybardHeight = [" + softKeybardHeight + "], visible = [" + visible + "]");
             if (visible) {
+//            Log.d(TAG, "video onSoftKeyBoardChange() called with: " + "softKeybardHeight = [" + softKeybardHeight + "], visible = [" + visible + "]");
                 mHandler.sendEmptyMessageDelayed(MSG_SHOW_DANMU_INPUT, 100);
                 if (mDanmuInputMargin != softKeybardHeight) {
                     mDanmuInputMargin = softKeybardHeight;
@@ -178,10 +176,8 @@ public class MovieController extends RelativeLayout implements IController {
     };
     
     private void addWidgets() {
+        mWidgetArray.clear();
         mPlayerMenuWidget = new PlayerMenuWidget(mContext);
-        addView(mPlayerMenuWidget);
-        mWidgets.add(mPlayerMenuWidget);
-
         ArrayList<PlayerMenuWidget.PlayerMenuData> menuData = new ArrayList<PlayerMenuWidget.PlayerMenuData>();
         menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_PLAY, "播放"));
         menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_PLAY, false, "单个循环"));
@@ -195,18 +191,24 @@ public class MovieController extends RelativeLayout implements IController {
         menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_DNLA, false, "xbmc"));
         menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_DNLA, false, "xiaomi"));
         mPlayerMenuWidget.setMenuData(menuData);
-        mPlayerMenuWidget.hideWithAnim(false);
+        addView(mPlayerMenuWidget);
 
-//        mShareWidget = new ShareWidget(mContext);
-//        addView(mShareWidget);
-//        mShareWidget.resetLayout(mIsHorizontal);
-//        mWidgets.add(mShareWidget);
+        mShareWidget = new ShareWidget(mContext);
+        mShareWidget.setOnDismissListener(new BaseWidget.OnDismissListener(){
+            @Override
+            public void onDismiss() {
+                showController();
+            }
+        });
+        addView(mShareWidget);
 
-
+        mWidgetArray.add(mShareWidget);
+        mWidgetArray.add(mPlayerMenuWidget);
     }
 
     private void resetLayout() {
         mPlayerMenuWidget.resetLayout(mIsHorizontal);
+        mShareWidget.resetLayout(mIsHorizontal);
     }
 
     private SeekBar.OnSeekBarChangeListener mSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
@@ -343,6 +345,15 @@ public class MovieController extends RelativeLayout implements IController {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         Log.d(TAG, "video onKeyDown() called with: " + "keyCode = [" + keyCode + "], event = [" + event + "]");
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            for (BaseWidget i : mWidgetArray) {
+                if (i.isShown()) {
+                    i.hide();
+                    return true;
+                }
+            }
+            ((Activity)mContext).finish();
+        }
         return super.onKeyDown(keyCode, event);
     }
 

@@ -16,7 +16,7 @@ import android.view.animation.Interpolator;
 public class AnimaUtils {
     private static final String TAG = "AnimaUtils";
 
-    private static int sAnimaDuration = 240;
+    private static int sAnimaDuration = 350;
     private static Interpolator sInterpolator = PathInterpolatorCompat.create(0.33f, 0f, 0.33f, 1f);
 
     public static void setMask(final View view, final boolean show) {
@@ -34,21 +34,6 @@ public class AnimaUtils {
         animator.setDuration(sAnimaDuration);
         animator.setInterpolator(sInterpolator);
         animator.setEvaluator(new ArgbEvaluator());
-        animator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if (!show) {
-//                    view.setVisibility(View.INVISIBLE);
-                }
-            }
-
-            @Override
-            public void onAnimationStart(Animator animation) {
-                if (show) {
-//                    view.setVisibility(View.VISIBLE);
-                }
-            }
-        });
         animator.start();
     }
 
