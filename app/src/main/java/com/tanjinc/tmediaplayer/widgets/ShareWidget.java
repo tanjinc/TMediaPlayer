@@ -78,6 +78,7 @@ public class ShareWidget extends BaseWidget{
         });
 
         setChildView(mRootView);
+        Log.d(TAG, "video init: " + mRootView.getWidth() + "/ " + mRootView.getHeight());
     }
 
     @Override
@@ -87,19 +88,16 @@ public class ShareWidget extends BaseWidget{
         if (isHorizion) {
             layoutParams.width = 600;
             layoutParams.height = LayoutParams.MATCH_PARENT;
-            layoutParams.rightMargin = 0;
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
             mRootView.setOrientation(LinearLayout.VERTICAL);
-            setAnimaType(FROM.RIGHT);
+            setAnimaType(FROM.CENTER);
         } else {
             layoutParams.height = 250;
             layoutParams.width = LayoutParams.MATCH_PARENT;
-            layoutParams.bottomMargin = 0;
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
             mRootView.setOrientation(LinearLayout.HORIZONTAL);
-            setAnimaType(FROM.BOTTOM);
+            setAnimaType(FROM.UP);
         }
         mRootView.setLayoutParams(layoutParams);
+        Log.d(TAG, "video resetLayout: " + mRootView.getWidth() + "/ " + mRootView.getHeight());
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data){

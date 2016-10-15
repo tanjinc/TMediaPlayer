@@ -113,8 +113,8 @@ public class MovieController extends RelativeLayout implements IController {
 //                    mPlayerMenuWidget.show();
 //                }
 //                showDanmu();
-                mPlayerMenuWidget.show();
-//                mShareWidget.show();
+//                mPlayerMenuWidget.show();
+                mShareWidget.show();
                 hideController();
                 break;
             case R.id.switch_float_btn:
@@ -191,7 +191,7 @@ public class MovieController extends RelativeLayout implements IController {
         menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_DNLA, false, "xbmc"));
         menuData.add(new PlayerMenuWidget.PlayerMenuData(PlayerMenuWidget.MENU_ITEM_TYPE.MENU_DNLA, false, "xiaomi"));
         mPlayerMenuWidget.setMenuData(menuData);
-        addView(mPlayerMenuWidget);
+        addView(mPlayerMenuWidget, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
         mShareWidget = new ShareWidget(mContext);
         mShareWidget.setOnDismissListener(new BaseWidget.OnDismissListener(){
@@ -200,7 +200,7 @@ public class MovieController extends RelativeLayout implements IController {
                 showController();
             }
         });
-        addView(mShareWidget);
+        addView(mShareWidget,LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
         mWidgetArray.add(mShareWidget);
         mWidgetArray.add(mPlayerMenuWidget);
@@ -280,7 +280,7 @@ public class MovieController extends RelativeLayout implements IController {
         AnimaUtils.showControllerTranslate(mTopLayout, true);
         AnimaUtils.showControllerTranslate(mBottomLayout, false);
         AnimaUtils.setMask(this, true);
-        mTimeAndPowerView.star();
+//        mTimeAndPowerView.star();
         mIsShowing = true;
     }
 
@@ -290,7 +290,7 @@ public class MovieController extends RelativeLayout implements IController {
         AnimaUtils.hideControllerTranslate(mTopLayout, true);
         AnimaUtils.hideControllerTranslate(mBottomLayout, false);
         AnimaUtils.setMask(this, false);
-        mTimeAndPowerView.stop();
+//        mTimeAndPowerView.stop();
         mIsShowing = false;
     }
 
@@ -301,8 +301,8 @@ public class MovieController extends RelativeLayout implements IController {
 
     @Override
     public void start() {
-        mPlayBtn.setActivated(true);
-        mHandler.post(progressRunnable);
+//        mPlayBtn.setActivated(true);
+//        mHandler.post(progressRunnable);
     }
 
     @Override

@@ -31,6 +31,7 @@ public class VideoPlayActivity2 extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "video onCreate: ");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.player_root);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -57,25 +58,28 @@ public class VideoPlayActivity2 extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        Log.d(TAG, "onPause");
+        Log.d(TAG, "video onPause: ");
         mPlayer.onPause();
         super.onPause();
     }
 
     @Override
     protected void onResume() {
+        Log.d(TAG, "video onResume: ");
         mPlayer.onResume();
         super.onResume();
     }
 
     @Override
     protected void onStart() {
+        Log.d(TAG, "video onStart: ");
         mPlayer.start();
         super.onStart();
     }
 
     @Override
     protected void onDestroy() {
+        Log.d(TAG, "video onDestroy: ");
         super.onDestroy();
         mPlayer.suspend();
         KeyboardUtil.unObserveSoftKeyboard(this);
@@ -83,6 +87,7 @@ public class VideoPlayActivity2 extends AppCompatActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        Log.d(TAG, "video onKeyDown: ");
         if (mPlayer != null) {
             return mPlayer.onKeyDown(keyCode, event);
         }

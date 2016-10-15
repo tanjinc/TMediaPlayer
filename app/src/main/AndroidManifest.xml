@@ -62,7 +62,6 @@
                 <data android:scheme="sdksample"/>
             </intent-filter>
         </activity>
-
         <service android:name=".player.VideoPlayService"/>
 
     </application>

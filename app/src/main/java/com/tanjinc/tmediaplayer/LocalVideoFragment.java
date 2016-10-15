@@ -70,11 +70,11 @@ public class LocalVideoFragment extends ListFragment implements VideoContract.Vi
                         (position).getPath()));
 
 //                Intent intent = new Intent(Intent.ACTION_VIEW);
+//                Intent intent = new Intent(getActivity(), VideoWindowActivity.class);
 //                uri = Uri.parse(mVideoList.get(position).getPath());
 //                intent.setDataAndType(uri, "video/*");
 //                intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 //                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                intent.setClassName("com.meizu.media.video", "player.ui.VideoWindowActivity");
 //                startActivity(intent);
 
 //                SDCardHelper.createInstance(mContext);

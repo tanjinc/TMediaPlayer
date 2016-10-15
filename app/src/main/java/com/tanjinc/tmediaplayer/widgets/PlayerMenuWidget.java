@@ -181,17 +181,11 @@ public class PlayerMenuWidget extends BaseWidget{
         if (isHorizion) {
             layoutParams.width = ScreenUtil.getScreenWidth(mContext) / 2;
             layoutParams.height = LayoutParams.MATCH_PARENT;
-            layoutParams.topMargin = 0;
-            layoutParams.rightMargin = 0;
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
             setAnimaType(FROM.RIGHT);
 
         } else {
             layoutParams.height = ScreenUtil.getScreenHeight(mContext) / 2;
             layoutParams.width = LayoutParams.MATCH_PARENT;
-            layoutParams.leftMargin = 0;
-            layoutParams.bottomMargin = 0;
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
             setAnimaType(FROM.BOTTOM);
         }
         mRecyclerView.setLayoutParams(layoutParams);

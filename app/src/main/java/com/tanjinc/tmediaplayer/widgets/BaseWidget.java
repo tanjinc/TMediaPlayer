@@ -31,7 +31,7 @@ public abstract class BaseWidget extends RelativeLayout{
     private View mChildView;
 
     public enum FROM {
-        UP, BOTTOM, LEFT, RIGHT
+        UP, BOTTOM, LEFT, RIGHT, CENTER
     }
 
     public interface OnDismissListener {
@@ -45,12 +45,33 @@ public abstract class BaseWidget extends RelativeLayout{
 
     public void setAnimaType(FROM fromType) {
         mFrom = fromType;
+        if (mChildView != null) {
+            switch (mFrom) {
+                case UP:
+                    mLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                    break;
+                case BOTTOM:
+                    mLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                    break;
+                case LEFT:
+                    mLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+                    break;
+                case RIGHT:
+                    mLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                    break;
+                case CENTER:
+                    mLayoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+                    break;
+                default:
+                    break;
+            }
+            mChildView.setLayoutParams(mLayoutParams);
+        }
     }
 
     public void setChildView(View childView) {
         mChildView = childView;
         mLayoutParams= new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        mLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         addView(mChildView, mLayoutParams);
     }
 
@@ -68,17 +89,18 @@ public abstract class BaseWidget extends RelativeLayout{
         mOnDismissListener = listener;
     }
     /**
-     * 现实控件
+     * 显示控件
      */
     public void show() {
         AnimaUtils.setMask(this, true);
         int height = mChildView.getHeight();
         int width = mChildView.getWidth();
+        setClipChildren(true);
         ObjectAnimator transAnim = null;
         switch (mFrom) {
             case UP:
                 mChildView.setTranslationX(0);
-                transAnim = ObjectAnimator.ofFloat(mChildView, "translationY", 0, height);
+                transAnim = ObjectAnimator.ofFloat(mChildView, "translationY", -height, 0);
                 break;
             case BOTTOM:
                 mChildView.setTranslationX(0);
@@ -86,11 +108,14 @@ public abstract class BaseWidget extends RelativeLayout{
                 break;
             case LEFT:
                 mChildView.setTranslationY(0);
-                transAnim = ObjectAnimator.ofFloat(mChildView, "translationX", 0, width);
+                transAnim = ObjectAnimator.ofFloat(mChildView, "translationX", -width, 0);
                 break;
             case RIGHT:
                 mChildView.setTranslationY(0);
                 transAnim = ObjectAnimator.ofFloat(mChildView, "translationX", width, 0);
+                break;
+            case CENTER:
+                transAnim = ObjectAnimator.ofFloat(mChildView, "alpha", 0, 1);
                 break;
             default:
                 break;
@@ -113,7 +138,7 @@ public abstract class BaseWidget extends RelativeLayout{
         switch (mFrom) {
             case UP:
                 mChildView.setTranslationX(0);
-                transAnim = ObjectAnimator.ofFloat(mChildView, "translationY", height, 0);
+                transAnim = ObjectAnimator.ofFloat(mChildView, "translationY", 0, -height);
                 break;
             case BOTTOM:
                 mChildView.setTranslationX(0);
@@ -126,6 +151,9 @@ public abstract class BaseWidget extends RelativeLayout{
             case RIGHT:
                 mChildView.setTranslationY(0);
                 transAnim = ObjectAnimator.ofFloat(mChildView, "translationX", 0, width);
+                break;
+            case CENTER:
+                transAnim = ObjectAnimator.ofFloat(mChildView, "alpha", 1, 0);
                 break;
             default:
                 break;

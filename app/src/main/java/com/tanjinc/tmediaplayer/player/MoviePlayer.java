@@ -95,7 +95,7 @@ public class MoviePlayer extends FrameLayout {
 
     public void onResume() {
         start();
-        mController.showController();
+//        mController.showController();
     }
 
     public void start() {

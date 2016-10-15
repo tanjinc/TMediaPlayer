@@ -4,12 +4,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.BatteryManager;
 import android.os.Handler;
 import android.text.format.DateUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -22,16 +24,10 @@ public class TimeAndPowerView extends LinearLayout{
     private static final String TAG = "TimeAndPowerView";
 
     private TextView mTimeText;
-    private TextView mPowerView;
-
-    private boolean mIsCharging = false;
+    private BatteryView mBatteryView;
 
     final Handler mHandler = new Handler();
     private Runnable mRunnable;
-
-    private Context mContext;
-
-
 
     public TimeAndPowerView(Context context) {
         super(context);
@@ -49,17 +45,18 @@ public class TimeAndPowerView extends LinearLayout{
     }
 
     private void init(Context context) {
-
-        mContext = context;
         mTimeText = new TextView(context);
-        mPowerView = new TextView(context);
+        mTimeText.setTextColor(Color.WHITE);
+        mTimeText.setTextSize(10);
+
+        mBatteryView = new BatteryView(context);
 
         setOrientation(VERTICAL);
         LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
         addView(mTimeText, layoutParams);
 
-        addView(mPowerView, layoutParams);
+        addView(mBatteryView, layoutParams);
 
         mRunnable = new Runnable() {
             @Override
@@ -69,50 +66,30 @@ public class TimeAndPowerView extends LinearLayout{
             }
         };
 
-        mContext.registerReceiver(mPowerConnectionReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
-
-
-    private BroadcastReceiver mPowerConnectionReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-            mIsCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
-                    status == BatteryManager.BATTERY_STATUS_FULL;
-
-            int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-            int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-
-            float batteryPct = level / (float)scale;
-            Log.d(TAG, "video onReceive: " + batteryPct);
-            mPowerView.setText(batteryPct * 100 + "%");
-        }
-    };
 
 
     private String getTime() {
-        String ret =  DateUtils.formatDateTime(mContext, System.currentTimeMillis(), DateUtils.FORMAT_SHOW_TIME);
-//        Log.d(TAG, "video getTime: " + ret);
+        String ret =  DateUtils.formatDateTime(getContext(), System.currentTimeMillis(), DateUtils.FORMAT_SHOW_TIME);
         return ret;
     }
 
-    public void star() {
+    private void star() {
         mHandler.post(mRunnable);
     }
 
-    public void stop() {
-        mHandler.removeCallbacks(mRunnable);
-    }
-
-    public void destory() {
-        mContext.unregisterReceiver(mPowerConnectionReceiver);
+    private void stop() {
         mHandler.removeCallbacks(mRunnable);
     }
 
     @Override
-    protected void onDetachedFromWindow() {
-        destory();
-        super.onDetachedFromWindow();
+    protected void onVisibilityChanged(View changedView, int visibility) {
+        Log.d(TAG, "video onVisibilityChanged() " + visibility);
+        if (visibility == VISIBLE) {
+            star();
+        } else {
+            stop();
+        }
     }
 }
 
