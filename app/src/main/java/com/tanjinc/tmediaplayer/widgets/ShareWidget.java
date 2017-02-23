@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -26,7 +27,7 @@ import com.tanjinc.tmediaplayer.utils.ScreenUtil;
 /**
  * Created by tanjincheng on 16/5/14.
  */
-public class ShareWidget extends BaseWidget{
+public class ShareWidget extends BaseWidget implements View.OnClickListener{
 
     private static final String TAG = "ShareWidget";
     private Context mContext;
@@ -36,6 +37,7 @@ public class ShareWidget extends BaseWidget{
     private WBShareView mWBShareView;
     private WXShareView mWXShareView;
     private WXShareView mWXSceneTimelineView;
+    private ImageView mShareView;
     private LinearLayout mRootView;
 
 
@@ -77,6 +79,9 @@ public class ShareWidget extends BaseWidget{
             }
         });
 
+        mShareView = (ImageView) mRootView.findViewById(R.id.share_other);
+        mShareView.setOnClickListener(this);
+
         setChildView(mRootView);
         Log.d(TAG, "video init: " + mRootView.getWidth() + "/ " + mRootView.getHeight());
     }
@@ -102,5 +107,15 @@ public class ShareWidget extends BaseWidget{
 
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         mWBShareView.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.share_other:
+
+                break;
+
+        }
     }
 }

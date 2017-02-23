@@ -47,7 +47,7 @@ public class MoviePlayer extends FrameLayout {
 
     public MoviePlayer(Context context) {
         super(context);
-//        mActivity = (Activity)context;
+        mActivity = (Activity)context;
         mMainHandler = new Handler();
         setBackgroundColor(Color.BLACK);
         // 创建 VideoView
@@ -58,7 +58,7 @@ public class MoviePlayer extends FrameLayout {
         addView((View) mVideoView, layoutParams);
 
         // 创建 Controller
-        mController = new MovieController(context, mVideoView);
+        mController = new MovieController(mActivity, mVideoView);
         addView(mController, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         mVideoView.setCompletelistener(new IVideoView.CompleteListener() {

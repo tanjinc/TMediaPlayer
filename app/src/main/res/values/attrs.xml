@@ -8,6 +8,5 @@
             <enum name="right"  value="3"/>
         </attr>
         <attr name="showText2"   format="boolean"/>
-
     </declare-styleable>
 </resources>

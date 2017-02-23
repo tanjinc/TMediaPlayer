@@ -23,6 +23,7 @@ import android.widget.TextView;
 import com.tanjinc.tmediaplayer.R;
 import com.tanjinc.tmediaplayer.utils.AnimaUtils;
 import com.tanjinc.tmediaplayer.utils.KeyboardUtil;
+import com.tanjinc.tmediaplayer.utils.ScreenUtil;
 import com.tanjinc.tmediaplayer.utils.VideoUtils;
 import com.tanjinc.tmediaplayer.utils.WindowUtil;
 import com.tanjinc.tmediaplayer.widgets.BaseWidget;
@@ -84,14 +85,14 @@ public class MovieController extends RelativeLayout implements IController {
     private boolean mIsHorizontal;
     //widget
     private PlayerMenuWidget mPlayerMenuWidget;
-    private ShareWidget mShareWidget;
+//    private ShareWidget mShareWidget;
     private ArrayList<BaseWidget> mWidgetArray = new ArrayList<>();
 
     @OnClick({R.id.share_btn, R.id.play, R.id.player_menu_btn, R.id.switch_float_btn})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.share_btn:
-                mShareWidget.show();
+//                mShareWidget.show();
                 break;
             case R.id.play:
                 if (mPlayer.isPlaying()) {
@@ -114,7 +115,7 @@ public class MovieController extends RelativeLayout implements IController {
 //                }
 //                showDanmu();
 //                mPlayerMenuWidget.show();
-                mShareWidget.show();
+//                mShareWidget.show();
                 hideController();
                 break;
             case R.id.switch_float_btn:
@@ -193,22 +194,22 @@ public class MovieController extends RelativeLayout implements IController {
         mPlayerMenuWidget.setMenuData(menuData);
         addView(mPlayerMenuWidget, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
-        mShareWidget = new ShareWidget(mContext);
-        mShareWidget.setOnDismissListener(new BaseWidget.OnDismissListener(){
-            @Override
-            public void onDismiss() {
-                showController();
-            }
-        });
-        addView(mShareWidget,LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-
-        mWidgetArray.add(mShareWidget);
+//        mShareWidget = new ShareWidget(mContext);
+//        mShareWidget.setOnDismissListener(new BaseWidget.OnDismissListener(){
+//            @Override
+//            public void onDismiss() {
+//                showController();
+//            }
+//        });
+//        addView(mShareWidget,LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+//
+//        mWidgetArray.add(mShareWidget);
         mWidgetArray.add(mPlayerMenuWidget);
     }
 
     private void resetLayout() {
         mPlayerMenuWidget.resetLayout(mIsHorizontal);
-        mShareWidget.resetLayout(mIsHorizontal);
+//        mShareWidget.resetLayout(mIsHorizontal);
     }
 
     private SeekBar.OnSeekBarChangeListener mSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
@@ -282,6 +283,7 @@ public class MovieController extends RelativeLayout implements IController {
         AnimaUtils.setMask(this, true);
 //        mTimeAndPowerView.star();
         mIsShowing = true;
+        ScreenUtil.setStatusBarVisible((Activity) mContext, true);
     }
 
     @Override
@@ -292,6 +294,7 @@ public class MovieController extends RelativeLayout implements IController {
         AnimaUtils.setMask(this, false);
 //        mTimeAndPowerView.stop();
         mIsShowing = false;
+        ScreenUtil.setStatusBarVisible((Activity) mContext, false);
     }
 
     @Override
@@ -339,7 +342,7 @@ public class MovieController extends RelativeLayout implements IController {
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mShareWidget.onActivityResult(requestCode, resultCode, data);
+//        mShareWidget.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

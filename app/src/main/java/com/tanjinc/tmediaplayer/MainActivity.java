@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Fragment mLocalVideoFragment;
     private Fragment mDoubanMovieFragment;
+    private Fragment mFFmpegFragment;
     private ViewPagerAdapter mViewPagerAdapter;
 
     private ArrayList<Fragment> mFragmentArrayList = new ArrayList<>();
@@ -72,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         // create view
         mLocalVideoFragment = new LocalVideoFragment();
         mDoubanMovieFragment = new DoubanMovieFragment();
+        mFFmpegFragment = new FFmpegFragment();
 
         // create presenter
         new LocalVideoPresenter((VideoContract.View) mLocalVideoFragment, new LocalVideoDataSource(this));
@@ -80,9 +82,11 @@ public class MainActivity extends AppCompatActivity {
         mFragmentArrayList.clear();
         mFragmentArrayList.add(mLocalVideoFragment);
         mFragmentArrayList.add(mDoubanMovieFragment);
+        mFragmentArrayList.add(mFFmpegFragment);
 
         mTitleList.add("本地视频");
         mTitleList.add("豆瓣Top10");
+        mTitleList.add("FFmpeg");
 
 
         mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
