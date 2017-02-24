@@ -62,11 +62,15 @@ public class MainActivity extends AppCompatActivity {
             WindowManager.LayoutParams localLayoutParams = getWindow().getAttributes();
             localLayoutParams.flags = (WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | localLayoutParams.flags);
         }
-        initToolbar();
+//        initToolbar();
         initDrawerLayout();
         initViewPager();
     }
 
+    private void addFragment(Fragment fragment, String name) {
+        mFragmentArrayList.add(fragment);
+        mTitleList.add(name);
+    }
 
     private void initViewPager() {
         // 采用Google官方MVP模板
@@ -80,13 +84,11 @@ public class MainActivity extends AppCompatActivity {
         new LocalVideoPresenter((VideoContract.View) mDoubanMovieFragment, new DoubanMovieDataSource(this));
 
         mFragmentArrayList.clear();
-        mFragmentArrayList.add(mLocalVideoFragment);
-        mFragmentArrayList.add(mDoubanMovieFragment);
-        mFragmentArrayList.add(mFFmpegFragment);
+        mTitleList.clear();
 
-        mTitleList.add("本地视频");
-        mTitleList.add("豆瓣Top10");
-        mTitleList.add("FFmpeg");
+        addFragment(mLocalVideoFragment, getResources().getString(R.string.local_videos));
+        addFragment(mDoubanMovieFragment, getResources().getString(R.string.douban_top10_videos));
+        addFragment(mFFmpegFragment, getResources().getString(R.string.ffmpeg));
 
 
         mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
@@ -129,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initToolbar() {
-        mToolbar.setTitle("MyMediaPlayer");
+        mToolbar.setTitle(R.string.app_name);
         mToolbar.setTitleTextColor(Color.WHITE);
         mToolbar.inflateMenu(R.menu.menu_main);
         mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {

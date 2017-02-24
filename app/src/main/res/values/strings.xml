@@ -4,4 +4,7 @@
     <string name="author">tanjinc</string>
     <string name="action_edit">Edit</string>
     <string name="action_share">Share</string>
+    <string name="local_videos">Local Videos</string>
+    <string name="douban_top10_videos">DoubanTop10</string>
+    <string name="ffmpeg">FFMPEG</string>
 </resources>

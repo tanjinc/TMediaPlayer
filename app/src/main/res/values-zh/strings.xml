@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TMediaPlayer</string>
+    <string name="action_edit">编辑</string>
+    <string name="action_settings">设置</string>
+    <string name="action_share">分享</string>
+    <string name="author">作者</string>
+    <string name="local_videos">本地视频</string>
+    <string name="douban_top10_videos">豆瓣TOP10</string>
+    <string name="ffmpeg">FFMPEG</string>
+</resources>

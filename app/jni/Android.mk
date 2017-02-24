@@ -56,3 +56,13 @@ LOCAL_C_INCLUDES += $(LOCAL_PATH)/include
 LOCAL_LDLIBS := -llog -lz
 LOCAL_SHARED_LIBRARIES := avcodec avdevice avfilter avformat avutil postproc swresample swscale
 include $(BUILD_SHARED_LIBRARY)
+
+#C++ FFMpeg build
+include $(CLEAR_VARS)
+LOCAL_MODULE := cffmpeg
+LOCAL_SRC_FILES := CFFmpeg.cpp
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/include
+LOCAL_LDLIBS := -llog -lz
+LOCAL_CFLAGS := -D__STDC_CONSTANT_MACROS
+LOCAL_SHARED_LIBRARIES := avcodec avdevice avfilter avformat avutil postproc swresample swscale
+include $(BUILD_SHARED_LIBRARY)

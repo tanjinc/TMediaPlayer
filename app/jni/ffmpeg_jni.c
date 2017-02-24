@@ -21,6 +21,7 @@
 #include <string.h>
 #include <jni.h>
 #include <ffmpeg.h>
+#include "CFFmpeg.h"
 
 #ifdef ANDROID
 #include <jni.h>
@@ -32,7 +33,7 @@
 #define LOGI(format, ...)  printf("(^_^) " format "\n", ##__VA_ARGS__)
 #endif
 
-
+CFFmpeg mCffmpeg;
 int ffmpegmain(int argc, char **argv);
 
 //Output FFmpeg's av_log()
@@ -93,6 +94,7 @@ JNIEXPORT jint JNICALL Java_com_tanjinc_tmediaplayer_utils_FFmpegUtils_ffmpegcor
 
   //FFmpeg av_log() callback
   av_log_set_callback(custom_log);
+  mCffmpeg = new CFFmpeg();
 
   int argc=cmdnum;
   char** argv=(char**)malloc(sizeof(char*)*argc);
