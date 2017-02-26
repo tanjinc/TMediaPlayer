@@ -1,3 +1,4 @@
+/*
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,3 +31,4 @@ class CFFmpeg {
         AVFrame *pAudioFrame;
 
 };
+*/

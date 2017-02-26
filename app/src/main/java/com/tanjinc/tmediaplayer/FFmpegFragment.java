@@ -18,6 +18,7 @@ import com.tanjinc.tmediaplayer.utils.FFmpegUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.dxjia.ffmpeg.library.FFmpegNativeHelper;
 
 /**
  * Created by tanjinc on 17-2-22.
@@ -30,12 +31,15 @@ public class FFmpegFragment extends Fragment {
     @BindView(R.id.video_info_tv)
     TextView mInfoTextView;
 
+    String cmdline = "ffmpeg -t 5 -ss 00:00:00 -i /storage/emulated/0/DingTalk/1_3_37.mov -s 320x240 /sdcard/1_3_37.gif";
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.ffmpeg_layout, container, false);
         ButterKnife.bind(this, view);
-        mCmdEditText.setText("ffmpeg -i /storage/emulated/0/Movies/243819777-2.mp4 /sdcard/111.mkv");
+        mCmdEditText.setText(cmdline);
+//        mCmdEditText.setText(cmdline);
 //        Button startButton= (Button) view.findViewById(R.id.start_btn);
 //
 //        startButton.setOnClickListener(new View.OnClickListener() {
@@ -57,33 +61,16 @@ public class FFmpegFragment extends Fragment {
                 mInfoTextView.setText(FFmpegUtils.getInstance().getVideoFormatInfo());
                 break;
             case R.id.start_btn:
-                String cmdline=mCmdEditText.getText().toString();
-                String[] argv=cmdline.split(" ");
-                Integer argc=argv.length;
-                new FFmpegTask(argv, argc).execute();
+                FFmpegUtils.getInstance().setOnCompleteListener(new FFmpegUtils.OnCompleteListener() {
+                    @Override
+                    public void onComplete() {
+                        Log.d(TAG, "video onComplete: ");
+                    }
+                });
+                FFmpegUtils.getInstance().performFFmpeg(mCmdEditText.getText().toString());
                 break;
             default:
                 break;
         }
     }
-
-    class FFmpegTask extends AsyncTask {
-        String[] argv = null;
-        int argc = 0;
-        public FFmpegTask(String[] argv, int argc) {
-            this.argv = argv;
-            this.argc = argc;
-        }
-        @Override
-        protected Object doInBackground(Object[] params) {
-            Log.d(TAG, "video doInBackground() ");
-            return FFmpegUtils.getInstance().performFFmpeg(argc,argv);
-        }
-
-        @Override
-        protected void onPostExecute(Object o) {
-            Log.d(TAG, "video onPostExecute() "+o.toString());
-        }
-    }
-
 }

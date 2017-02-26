@@ -51,6 +51,7 @@ include $(PREBUILT_SHARED_LIBRARY)
 # Program
 include $(CLEAR_VARS)
 LOCAL_MODULE := ffmpeg_util
+LOCAL_CFLAGS := -DANDROID
 LOCAL_SRC_FILES :=ffmpeg_jni.c ffmpeg_util_jni.c ffmpeg_mod.c ffmpeg_opt.c ffmpeg_filter.c cmdutils.c
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/include
 LOCAL_LDLIBS := -llog -lz
@@ -63,6 +64,6 @@ LOCAL_MODULE := cffmpeg
 LOCAL_SRC_FILES := CFFmpeg.cpp
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/include
 LOCAL_LDLIBS := -llog -lz
-LOCAL_CFLAGS := -D__STDC_CONSTANT_MACROS
+LOCAL_CFLAGS := -D__STDC_CONSTANT_MACROS -DANDROID
 LOCAL_SHARED_LIBRARIES := avcodec avdevice avfilter avformat avutil postproc swresample swscale
 include $(BUILD_SHARED_LIBRARY)

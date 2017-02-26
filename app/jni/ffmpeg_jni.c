@@ -22,18 +22,8 @@
 #include <jni.h>
 #include <ffmpeg.h>
 #include "CFFmpeg.h"
+#include <ffmpeg_jni.h>
 
-#ifdef ANDROID
-#include <jni.h>
-#include <android/log.h>
-#define LOGE(format, ...)  __android_log_print(ANDROID_LOG_ERROR, "(>_<)", format, ##__VA_ARGS__)
-#define LOGI(format, ...)  __android_log_print(ANDROID_LOG_INFO,  "(^_^)", format, ##__VA_ARGS__)
-#else
-#define LOGE(format, ...)  printf("(>_<) " format "\n", ##__VA_ARGS__)
-#define LOGI(format, ...)  printf("(^_^) " format "\n", ##__VA_ARGS__)
-#endif
-
-CFFmpeg mCffmpeg;
 int ffmpegmain(int argc, char **argv);
 
 //Output FFmpeg's av_log()
@@ -41,6 +31,7 @@ void custom_log(void *ptr, int level, const char* fmt, va_list vl){
 
 	//To TXT file
 
+/*
 	FILE *fp=fopen("/storage/emulated/0/av_log.txt","a+");
 	if(fp){
 		vfprintf(fp,fmt,vl);
@@ -48,8 +39,9 @@ void custom_log(void *ptr, int level, const char* fmt, va_list vl){
 		fclose(fp);
 	}
 
-
+*/
 	//To Logcat
+	__android_log_print(ANDROID_LOG_ERROR, "FFmpeg_jni", fmt, vl);
 	//LOGE(fmt, vl);
 }
 
@@ -94,7 +86,6 @@ JNIEXPORT jint JNICALL Java_com_tanjinc_tmediaplayer_utils_FFmpegUtils_ffmpegcor
 
   //FFmpeg av_log() callback
   av_log_set_callback(custom_log);
-  mCffmpeg = new CFFmpeg();
 
   int argc=cmdnum;
   char** argv=(char**)malloc(sizeof(char*)*argc);

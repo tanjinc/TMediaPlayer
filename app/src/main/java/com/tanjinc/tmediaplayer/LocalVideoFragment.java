@@ -18,10 +18,12 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tanjinc.tmediaplayer.data.VideoData;
 import com.tanjinc.tmediaplayer.player.VideoPlayActivity;
 import com.tanjinc.tmediaplayer.player.VideoPlayActivity2;
+import com.tanjinc.tmediaplayer.utils.FFmpegUtils;
 import com.tanjinc.tmediaplayer.utils.ImageUtil;
 
 import java.util.ArrayList;
@@ -84,6 +86,17 @@ public class LocalVideoFragment extends ListFragment implements VideoContract.Vi
 //                SDCardHelper.getInstance().getMountPointList(mContext);
 //                SDCardHelper.MountPoint  a = SDCardHelper.getInstance().getSDCardMountPoint();
 //                boolean b = SDCardHelper.getInstance().isMounted();
+            }
+        });
+        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                VideoData videoData = mVideoList.get(position);
+                String path = videoData.getPath();
+                String gifName = videoData.getParentDir() + "/" + videoData.getName() + ".gif";
+                FFmpegUtils.getInstance().video2Gif(path, gifName, 10, "00:00:00");
+                Toast.makeText(mContext, "生成"+gifName + "成功",Toast.LENGTH_SHORT).show();
+                return true;
             }
         });
     }

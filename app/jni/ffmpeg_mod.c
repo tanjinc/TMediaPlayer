@@ -102,6 +102,7 @@
 #include "cmdutils.h"
 
 #include "libavutil/avassert.h"
+#include "ffmpeg_jni.h"
 
 const char program_name[] = "ffmpeg";
 const int program_birth_year = 2000;
@@ -3988,8 +3989,9 @@ static void av_log_callback(void* ptr, int level, const char* fmt, va_list vl)
   if(fp){   
     vfprintf(fp,fmt,vl);   
     fflush(fp);   
-  }   
-  printf("LOG CALLED\n");
+  }
+  __android_log_vprint(ANDROID_LOG_INFO, "FFmpeg_native", fmt, vl);
+  //printf("LOG CALLED\n");
 }   
 
 
@@ -3997,11 +3999,60 @@ static void log_callback_null(void *ptr, int level, const char *fmt, va_list vl)
 {
 }
 
+// 视频转换成gif
+int video2gif(char* input_str, int duration) {
+    int ret;
+
+    AVFormatContext *pFormatCtx;
+    int             i, videoindex;
+    AVCodecContext  *pCodecCtx;
+    AVCodec         *pCodec;
+    AVFrame *pFrame,*pFrameYUV;
+    uint8_t *out_buffer;
+    AVPacket *packet;
+
+    avcodec_register_all();
+    avfilter_register_all();
+    av_register_all();
+
+    pFormatCtx = avformat_alloc_context();
+
+    if(avformat_open_input(&pFormatCtx,input_str,NULL,NULL)!=0){
+       // LOGE("Couldn't open input stream.\n");
+        return -1;
+    }
+    if(avformat_find_stream_info(pFormatCtx,NULL)<0){
+       // LOGE("Couldn't find stream information.\n");
+        return -1;
+    }
+    videoindex=-1;
+    for(i=0; i<pFormatCtx->nb_streams; i++)
+        if(pFormatCtx->streams[i]->codec->codec_type==AVMEDIA_TYPE_VIDEO){
+            videoindex=i;
+            break;
+        }
+    if(videoindex==-1){
+         //LOGE("Couldn't find a video stream.\n");
+        return -1;
+    }
+
+    pCodecCtx=pFormatCtx->streams[videoindex]->codec;
+    pCodec=avcodec_find_decoder(pCodecCtx->codec_id);
+    if(pCodec==NULL){
+        //LOGE("Couldn't find Codec.\n");
+        return -1;
+    }
+    if(avcodec_open2(pCodecCtx, pCodec,NULL)<0){
+       // LOGE("Couldn't open codec.\n");
+        return -1;
+    }
+}
+
 int ffmpegmain(int argc, char **argv)
 {
     int ret;
     int64_t ti;
-    //av_log_set_callback(av_log_callback); 
+    av_log_set_callback(av_log_callback);
     register_exit(ffmpeg_cleanup);
 
     setvbuf(stderr,NULL,_IONBF,0); /* win32 runtime needs this */
