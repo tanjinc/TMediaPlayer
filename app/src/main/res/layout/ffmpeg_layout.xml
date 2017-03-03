@@ -23,6 +23,11 @@
             android:layout_height="wrap_content"
             android:text="info"
             />
+        <Button
+            android:id="@+id/transcode_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="transcode"/>
     </LinearLayout>
     <TextView
         android:id="@+id/video_info_tv"

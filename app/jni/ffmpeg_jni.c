@@ -25,6 +25,7 @@
 #include <ffmpeg_jni.h>
 
 int ffmpegmain(int argc, char **argv);
+int transcode(char* inputfile, char* outoutfile);
 
 //Output FFmpeg's av_log()
 void custom_log(void *ptr, int level, const char* fmt, va_list vl){
@@ -45,42 +46,20 @@ void custom_log(void *ptr, int level, const char* fmt, va_list vl){
 	//LOGE(fmt, vl);
 }
 
-//jstring char2jstring(JNIEnv* env, const char* pat)
-//{
-//    jclass strClass = env->FindClass("Ljava/lang/String;");
-//    jmethodID ctorID = env->GetMethodID(strClass, "<init>", "([BLjava/lang/String;)V");
-//    jbyteArray bytes = env->NewByteArray(strlen(pat));
-//    env->SetByteArrayRegion(bytes, 0, strlen(pat), (jbyte*)pat);
-//    jstring encoding = env->NewStringUTF("utf-8");
-//    return (jstring)env->NewObject(strClass, ctorID, bytes, encoding);
-//}
 
-//jstring Java_com_example_hellojni_HelloJni_stringFromJNI( JNIEnv* env, jobject thiz )
-//{
-//    char info[10000] = { 0 };
-//    sprintf(info, "%s\n", avcodec_configuration());
-//    return (*env)->NewStringUTF(env, info);
-//}
+JNIEXPORT jint JNICALL Java_com_tanjinc_tmediaplayer_utils_FFmpegUtils_transcodeJNI( JNIEnv * env, jobject thiz, jobject inputfile, jobject outoutfile)
+{
 
-//void native_show_info(JNIEnv* env, char* info)
-//{
-//    /* 声明局部变量 */
-//    jobject zoomimage;
-//    jmethodID jId;
-//    jclass jffmpegUtils;
-//
-//    /* 查找指定名称类 */
-//    jffmpegUtils = (*env)->FindClass(env, "com/tanjinc/TMediaPlayer/utils/FFmpegUtils");
-//
-//    /*
-//        获取方法id
-//        (Ljava/lang/String)V表示此方法参数为String一个参数。返回值为void
-//    */
-//    jId = (*env)->GetMethodID(env, jffmpegUtils, "showInfo", "(Ljava/lang/String)V");
-//    (*env)->CallVoidMethod(env,jId, char2jstring(env, pat));
-//}
+  //FFmpeg av_log() callback
+  av_log_set_callback(custom_log);
+  char *inputfileName = (*env)->GetStringUTFChars(env,inputfile,0);
+  char *outFileName = (*env)->GetStringUTFChars(env,outoutfile,0);
 
-///home/tanjinc/tanjinc/secondWord/TMediaPlayer/app/src/main/java/com/tanjinc/tmediaplayer/FFmpegFragment.java
+  transcode(inputfileName,outFileName);
+  return 0;
+
+}
+
 JNIEXPORT jint JNICALL Java_com_tanjinc_tmediaplayer_utils_FFmpegUtils_ffmpegcore( JNIEnv * env, jobject thiz, jint cmdnum, jobjectArray cmdline)
 {
 
@@ -89,7 +68,7 @@ JNIEXPORT jint JNICALL Java_com_tanjinc_tmediaplayer_utils_FFmpegUtils_ffmpegcor
 
   int argc=cmdnum;
   char** argv=(char**)malloc(sizeof(char*)*argc);
-  
+
   int i=0;
   for(i=0;i<argc;i++)
   {

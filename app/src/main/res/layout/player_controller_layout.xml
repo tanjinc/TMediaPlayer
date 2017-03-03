@@ -105,13 +105,13 @@
         android:visibility="gone"
         />
 
-    <!--<com.tanjinc.tmediaplayer.widgets.PlayerMenuWidget-->
-        <!--android:id="@+id/menu_widget"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:background="#ff7777"-->
-        <!--android:layout_alignParentBottom="true">-->
-
-    <!--</com.tanjinc.tmediaplayer.widgets.PlayerMenuWidget>-->
+    <com.tanjinc.tmediaplayer.widgets.RecordingView
+        android:id="@+id/recording_view"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        app:roundWidth="10dp"
+        app:roundProgressColor="@color/progress_color"/>
 
 </RelativeLayout>

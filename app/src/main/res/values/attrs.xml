@@ -9,4 +9,9 @@
         </attr>
         <attr name="showText2"   format="boolean"/>
     </declare-styleable>
+    <declare-styleable name="RecordingView">
+        <attr name="roundColor" format="color"/>
+        <attr name="roundWidth" format="dimension"/>
+        <attr name="roundProgressColor" format="color"/>
+    </declare-styleable>
 </resources>

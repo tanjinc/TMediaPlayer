@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
@@ -19,18 +21,22 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tanjinc.tmediaplayer.R;
 import com.tanjinc.tmediaplayer.utils.AnimaUtils;
+import com.tanjinc.tmediaplayer.utils.FFmpegUtils;
 import com.tanjinc.tmediaplayer.utils.KeyboardUtil;
 import com.tanjinc.tmediaplayer.utils.ScreenUtil;
 import com.tanjinc.tmediaplayer.utils.VideoUtils;
 import com.tanjinc.tmediaplayer.utils.WindowUtil;
 import com.tanjinc.tmediaplayer.widgets.BaseWidget;
 import com.tanjinc.tmediaplayer.widgets.PlayerMenuWidget;
+import com.tanjinc.tmediaplayer.widgets.RecordingView;
 import com.tanjinc.tmediaplayer.widgets.ShareWidget;
 import com.tanjinc.tmediaplayer.widgets.TimeAndPowerView;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -76,19 +82,22 @@ public class MovieController extends RelativeLayout implements IController {
     @BindView(R.id.switch_float_btn)
     ImageView mSwitchBtn;
 
+    @BindView(R.id.recording_view) RecordingView mRecordingView;
+
     private Context mContext;
     private boolean mIsShowing;
     private IVideoView mPlayer;
 
-
     private int mDanmuInputMargin;
     private boolean mIsHorizontal;
+    private int mCurrentPostion;
+    private String mGifname;
     //widget
     private PlayerMenuWidget mPlayerMenuWidget;
 //    private ShareWidget mShareWidget;
     private ArrayList<BaseWidget> mWidgetArray = new ArrayList<>();
 
-    @OnClick({R.id.share_btn, R.id.play, R.id.player_menu_btn, R.id.switch_float_btn})
+    @OnClick({R.id.share_btn, R.id.play, R.id.player_menu_btn, R.id.switch_float_btn, R.id.recording_view})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.share_btn:
@@ -123,7 +132,12 @@ public class MovieController extends RelativeLayout implements IController {
                 WindowUtil.getInstance().changeWindowSize(300, 200, 10, 10);
                 mContext.sendBroadcast(new Intent(VideoPlayActivity.ACTION_CLOSE_SELF));
                 break;
-            
+            case R.id.recording_view:
+
+                Log.d(TAG, "video onClick() mCurrentPostion:" + mCurrentPostion);
+                break;
+            default:
+                break;
         }
     }
 
@@ -150,11 +164,56 @@ public class MovieController extends RelativeLayout implements IController {
         mSeekbar.setThumb(null);
         mShareBtn.setVisibility(GONE);
         mDanmuInputLayout.setVisibility(GONE);
+        initRecording();
         addWidgets();
         resetLayout();
         KeyboardUtil.addSoftKeyboardChangedListener(mSoftKeyboardChangeListener);
     }
 
+    /**
+     * 初始话 截屏转换gif
+     */
+    private void initRecording() {
+        mRecordingView.setOnStateChangeListener(new RecordingView.OnStateChangeListener() {
+            @Override
+            public void onBegin() {
+                mCurrentPostion = mPlayer.getCurrentPosition();
+            }
+
+            @Override
+            public void onFinish(int duration) {
+                Log.d(TAG, "video onFinish() time=" + duration);
+                mGifname = "/sdcard/"+mPlayer.getTitle()+".gif";
+                int videoWidth = mPlayer.getVideoWidth();
+                int videoHeight = mPlayer.getVideoHeight();
+                int scaleNum;
+                if (videoWidth >= 1080 || videoHeight >= 1080) {
+                    scaleNum = 2;
+                } else {
+                    scaleNum = 1;
+                }
+                String scale = ((int)videoWidth / 2)+"x"+((int)videoHeight / scaleNum);
+                FFmpegUtils.getInstance().transcode(mPlayer.getUri().toString(), mGifname,scale, mCurrentPostion, duration);
+            }
+        });
+        FFmpegUtils.getInstance().setOnCompleteListener(new FFmpegUtils.OnCompleteListener() {
+            @Override
+            public void onComplete() {
+                Toast.makeText(mContext, mGifname + " 已经生成", Toast.LENGTH_SHORT).show();
+                //由文件得到uri
+                Intent shareIntent = new Intent();
+                File f = new File(mGifname);
+                if (f != null && f.exists() && f.isFile()) {
+                    shareIntent.setType("image/jpg");
+                    Uri u = Uri.fromFile(f);
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, u);
+                }
+
+                shareIntent.setAction(Intent.ACTION_SEND);
+                mContext.startActivity(Intent.createChooser(shareIntent, "分享到"));
+            }
+        });
+    }
     
     private KeyboardUtil.OnSoftKeyboardChangeListener mSoftKeyboardChangeListener = new KeyboardUtil.OnSoftKeyboardChangeListener() {
         @Override
@@ -175,7 +234,7 @@ public class MovieController extends RelativeLayout implements IController {
             }
         }
     };
-    
+
     private void addWidgets() {
         mWidgetArray.clear();
         mPlayerMenuWidget = new PlayerMenuWidget(mContext);

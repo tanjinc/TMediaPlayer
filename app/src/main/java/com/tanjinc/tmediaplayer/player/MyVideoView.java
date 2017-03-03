@@ -122,6 +122,16 @@ public class MyVideoView extends SurfaceView implements IVideoView{
     }
 
     @Override
+    public int getVideoWidth() {
+        return mMediaPlayer.getVideoWidth();
+    }
+
+    @Override
+    public int getVideoHeight() {
+        return mMediaPlayer.getVideoHeight();
+    }
+
+    @Override
     public int getCurrentPosition() {
         return mMediaPlayer != null && (isInPlaybackState())? mMediaPlayer.getCurrentPosition() : 0;
     }
@@ -313,9 +323,17 @@ public class MyVideoView extends SurfaceView implements IVideoView{
         requestLayout();
         invalidate();
     }
+
+    @Override
+    public Uri getUri() {
+        return mUri;
+    }
+
     @Override
     public String getTitle() {
         String path = Uri.decode(mUri.getPath());
-        return path != null ? path.substring(TextUtils.lastIndexOf(path, '/') + 1) : "";
+        String title = path.substring(TextUtils.lastIndexOf(path, '/') + 1);
+        return title.split("\\.")[0];
+//        return path != null ? path.substring(TextUtils.lastIndexOf(path, '/') + 1) : "";
     }
 }

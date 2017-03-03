@@ -149,6 +149,16 @@ public class ExoVideoView extends SurfaceView implements IVideoView, SurfaceHold
     }
 
     @Override
+    public int getVideoWidth() {
+        return 0;
+    }
+
+    @Override
+    public int getVideoHeight() {
+        return 0;
+    }
+
+    @Override
     public int getCurrentPosition() {
         return (int) mExoPlayer.getCurrentPosition();
     }
@@ -290,6 +300,11 @@ public class ExoVideoView extends SurfaceView implements IVideoView, SurfaceHold
     public void setUri(Uri uri) {
         mUri = uri;
         initView(mUri);
+    }
+
+    @Override
+    public Uri getUri() {
+        return mUri;
     }
 
     @Override

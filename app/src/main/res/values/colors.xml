@@ -11,4 +11,5 @@
 
     <color name="controller_layout_bg_color">#cc000000</color> <!-- 80透明黑色 -->
     <color name="text_color">#9fffffff</color>
+    <color name="progress_color">#1AE6E6</color>
 </resources>

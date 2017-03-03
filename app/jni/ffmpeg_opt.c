@@ -1764,6 +1764,7 @@ static int open_output_file(OptionsContext *o, const char *filename)
     InputStream  *ist;
     AVDictionary *unused_opts = NULL;
     AVDictionaryEntry *e = NULL;
+    av_log(NULL, AV_LOG_INFO, "output filename: %s", filename);
 
     if (configure_complex_filters() < 0) {
         av_log(NULL, AV_LOG_FATAL, "Error configuring filters.\n");

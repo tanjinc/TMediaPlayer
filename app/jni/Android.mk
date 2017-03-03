@@ -52,7 +52,7 @@ include $(PREBUILT_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 LOCAL_MODULE := ffmpeg_util
 LOCAL_CFLAGS := -DANDROID
-LOCAL_SRC_FILES :=ffmpeg_jni.c ffmpeg_util_jni.c ffmpeg_mod.c ffmpeg_opt.c ffmpeg_filter.c cmdutils.c
+LOCAL_SRC_FILES :=ffmpeg_jni.c ffmpeg_util_jni.c ffmpeg_mod.c ffmpeg_opt.c ffmpeg_filter.c cmdutils.c Transcoder.c
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/include
 LOCAL_LDLIBS := -llog -lz
 LOCAL_SHARED_LIBRARIES := avcodec avdevice avfilter avformat avutil postproc swresample swscale

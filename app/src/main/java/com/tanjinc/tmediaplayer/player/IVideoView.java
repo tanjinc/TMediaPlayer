@@ -19,6 +19,8 @@ public interface IVideoView {
     void    start();
     void    pause();
     int     getDuration();
+    int     getVideoWidth();
+    int     getVideoHeight();
     int     getCurrentPosition();
     long    getBufferedPosition();
     void    seekTo(int pos);
@@ -32,5 +34,6 @@ public interface IVideoView {
     public void setErrorListener(ErrorListener errorListener);
     public void release();
     public void setUri(Uri uri);
+    Uri getUri();
     public String getTitle();
 }

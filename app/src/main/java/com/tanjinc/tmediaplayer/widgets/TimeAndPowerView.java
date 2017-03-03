@@ -91,5 +91,11 @@ public class TimeAndPowerView extends LinearLayout{
             stop();
         }
     }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        stop();
+    }
 }
 
