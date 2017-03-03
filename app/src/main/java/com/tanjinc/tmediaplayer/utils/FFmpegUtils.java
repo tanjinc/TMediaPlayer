@@ -3,55 +3,52 @@ package com.tanjinc.tmediaplayer.utils;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import java.lang.ref.WeakReference;
+
 /**
  * Created by tanjinc on 17-2-23.
  */
 public class FFmpegUtils {
     private static final String TAG = "FFmpegUtils";
 
-    private static FFmpegUtils sInstance;
-    private OnCompleteListener mOnCompleteListener;
+//    private static FFmpegUtils sInstance;
+    private static OnCompleteListener mOnCompleteListener;
 
     public interface OnCompleteListener {
         void onComplete();
     }
 
-    private FFmpegUtils() {}
+//    private FFmpegUtils() {}
+//
+//    public static FFmpegUtils getInstance() {
+//        if (sInstance == null) {
+//            synchronized (FFmpegUtils.class) {
+//                if (sInstance == null) {
+//                    sInstance = new FFmpegUtils();
+//                }
+//            }
+//        }
+//        return sInstance;
+//    }
 
-    public static FFmpegUtils getInstance() {
-        if (sInstance == null) {
-            synchronized (FFmpegUtils.class) {
-                if (sInstance == null) {
-                    sInstance = new FFmpegUtils();
-                }
-            }
-        }
-        return sInstance;
+    public static void setOnCompleteListener(OnCompleteListener listener) {
+        WeakReference<OnCompleteListener> listenerWeakReference=new WeakReference<OnCompleteListener>(listener);
+        mOnCompleteListener = listenerWeakReference.get();
     }
 
-    public void setOnCompleteListener(OnCompleteListener listener) {
-        mOnCompleteListener = listener;
-    }
 
-
-    public void video2Gif(String videoName, String gifName, int duration, String startTime) {
-        String cmdline = "ffmpeg -t " + duration + " -ss " + startTime + " -i " + videoName + " " + gifName;
-        performFFmpeg(cmdline);
+    public static void video2Gif(String input, String output, String scale, String startTime, int duration) {
+        StringBuilder cmdString = new StringBuilder();
+        cmdString.append("ffmpeg");
+        cmdString.append(" -ss "+ startTime);
+        cmdString.append(" -t " + duration);
+        cmdString.append(" -r " + 15);
+        cmdString.append(" -i " + input);
+        cmdString.append(" -s " + scale);
+        cmdString.append(" " + output);
+        new FFmpegAsyncTask(cmdString.toString()).execute();
     }
-//    String cmdline = "ffmpeg -t 5 -ss 00:00:00 -r 10 -i http://v3.365yg.com/75808efd66db168fcf57eff436597c58/58b8e362/video/m/220be835fc4d4834879867ade7dd10a7feb114422500001ebab5f76e71/ -s 320x240 -b:v 1500k /sdcard/1.gif";
-
-    public void transcode(String input, String output, String scale, int startTime, int duration) {
-        String cmdline = "ffmpeg" +
-                " -ss " + startTime +
-                " -t " + duration +
-                " -r " + 10 +
-                " -i " + input +
-                " -s " + scale +
-                " " +output;
-        Log.d(TAG, "video transcode() cmdline=" + cmdline);
-        new FFmpegAsyncTask(cmdline).execute();
-    }
-    public int performFFmpeg(String cmdLine) {
+    public static int performFFmpeg(String cmdLine) {
         new FFmpegAsyncTask(cmdLine).execute();
         return 0;
     }
@@ -64,7 +61,7 @@ public class FFmpegUtils {
         return avformatinfo();
     }
 
-    class FFmpegAsyncTask extends AsyncTask{
+    static class FFmpegAsyncTask extends AsyncTask{
         int argc = 0;
         String[] argv=null;
         String in, out;
@@ -74,19 +71,13 @@ public class FFmpegUtils {
             argc = argv.length;
             Log.d(TAG, "video : argc= " + argc + " cmd= \n" + cmdline);
         }
-        FFmpegAsyncTask(String in, String out) {
-            this.in = in;
-            this.out = out;
-        }
 
         @Override
         protected Void doInBackground(Object[] params) {
             Log.d(TAG, "video doInBackground() ");
             if (argc > 0) {
                 Log.d(TAG, "video : argc= " + argc + " cmd= \n" + argv.toString());
-                FFmpegUtils.getInstance().ffmpegcore(argc, argv);
-            } else {
-                FFmpegUtils.getInstance().transcodeJNI(in, out);
+                FFmpegUtils.ffmpegcore(argc, argv);
             }
             return null;
         }
@@ -102,7 +93,7 @@ public class FFmpegUtils {
 
     //JNI
     private native String urlprotocolinfo();
-    private native int ffmpegcore(int argc, String[] argv);
+    private static native int ffmpegcore(int argc, String[] argv);
     private native int transcodeJNI(String input, String output);
     private native String avformatinfo();
     private native String avcodecinfo();

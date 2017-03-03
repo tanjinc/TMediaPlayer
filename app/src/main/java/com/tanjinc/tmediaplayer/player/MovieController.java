@@ -167,6 +167,7 @@ public class MovieController extends RelativeLayout implements IController {
         initRecording();
         addWidgets();
         resetLayout();
+        mHandler.post(progressRunnable);
         KeyboardUtil.addSoftKeyboardChangedListener(mSoftKeyboardChangeListener);
     }
 
@@ -192,11 +193,12 @@ public class MovieController extends RelativeLayout implements IController {
                 } else {
                     scaleNum = 1;
                 }
-                String scale = ((int)videoWidth / 2)+"x"+((int)videoHeight / scaleNum);
-                FFmpegUtils.getInstance().transcode(mPlayer.getUri().toString(), mGifname,scale, mCurrentPostion, duration);
+                String scale = ((int)videoWidth / scaleNum)+"x"+((int)videoHeight / scaleNum);
+                String startTime = VideoUtils.length2time(mCurrentPostion);
+                FFmpegUtils.video2Gif(mPlayer.getUri().toString(), mGifname,scale, startTime, duration);
             }
         });
-        FFmpegUtils.getInstance().setOnCompleteListener(new FFmpegUtils.OnCompleteListener() {
+        FFmpegUtils.setOnCompleteListener(new FFmpegUtils.OnCompleteListener() {
             @Override
             public void onComplete() {
                 Toast.makeText(mContext, mGifname + " 已经生成", Toast.LENGTH_SHORT).show();
@@ -342,7 +344,7 @@ public class MovieController extends RelativeLayout implements IController {
         AnimaUtils.setMask(this, true);
 //        mTimeAndPowerView.star();
         mIsShowing = true;
-        ScreenUtil.setStatusBarVisible((Activity) mContext, true);
+//        ScreenUtil.setStatusBarVisible((Activity) mContext, true);
     }
 
     @Override
@@ -353,7 +355,7 @@ public class MovieController extends RelativeLayout implements IController {
         AnimaUtils.setMask(this, false);
 //        mTimeAndPowerView.stop();
         mIsShowing = false;
-        ScreenUtil.setStatusBarVisible((Activity) mContext, false);
+//        ScreenUtil.setStatusBarVisible((Activity) mContext, false);
     }
 
     @Override

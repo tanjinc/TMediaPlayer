@@ -36,7 +36,7 @@
     <RelativeLayout
         android:id="@+id/bottom_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:layout_alignParentBottom="true">
         <ImageButton
             android:id="@+id/play"
@@ -55,6 +55,7 @@
             android:paddingRight="10dp"
             android:text="弹幕"
             android:textSize="12sp"
+            android:visibility="gone"
             android:layout_alignParentRight="true"/>
 
         <LinearLayout
@@ -79,7 +80,9 @@
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:progressDrawable="@drawable/seekbar_style"
+                />
             <TextView
                 android:id="@+id/duration_tv"
                 android:layout_gravity="center_vertical"

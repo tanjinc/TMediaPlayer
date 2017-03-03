@@ -94,8 +94,6 @@ public class LocalVideoFragment extends ListFragment implements VideoContract.Vi
                 VideoData videoData = mVideoList.get(position);
                 String path = videoData.getPath();
                 String gifName = videoData.getParentDir() + "/" + videoData.getName() + ".gif";
-                FFmpegUtils.getInstance().video2Gif(path, gifName, 10, "00:00:00");
-                Toast.makeText(mContext, "生成"+gifName + "成功",Toast.LENGTH_SHORT).show();
                 return true;
             }
         });

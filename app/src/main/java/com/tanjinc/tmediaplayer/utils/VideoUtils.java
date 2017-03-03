@@ -28,6 +28,9 @@ public class VideoUtils {
         long hour = minute / 60L;
         long second = length % 60L;
         minute %= 60L;
+        if (hour == 0) {
+            return String.format("%02d:%02d", minute, second);
+        }
         return String.format("%02d:%02d:%02d", hour, minute, second);
     }
 

@@ -47,17 +47,17 @@ public class FFmpegFragment extends Fragment {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.start_btn:
-                FFmpegUtils.getInstance().setOnCompleteListener(new FFmpegUtils.OnCompleteListener() {
+                FFmpegUtils.setOnCompleteListener(new FFmpegUtils.OnCompleteListener() {
                     @Override
                     public void onComplete() {
                         Toast.makeText(getActivity(), "gif 转换成功", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "video onComplete: ");
                     }
                 });
-                FFmpegUtils.getInstance().performFFmpeg(mCmdEditText.getText().toString());
+                FFmpegUtils.performFFmpeg(mCmdEditText.getText().toString());
                 break;
             case R.id.info_btn:
-                mInfoTextView.setText(FFmpegUtils.getInstance().getVideoFormatInfo());
+//                mInfoTextView.setText(FFmpegUtils.getInstance().getVideoFormatInfo());
                 break;
             case R.id.transcode_btn:
                 break;
