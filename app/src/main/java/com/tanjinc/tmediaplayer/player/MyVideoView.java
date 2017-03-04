@@ -332,8 +332,8 @@ public class MyVideoView extends SurfaceView implements IVideoView{
     @Override
     public String getTitle() {
         String path = Uri.decode(mUri.getPath());
-        String title = path.substring(TextUtils.lastIndexOf(path, '/') + 1);
-        return title.split("\\.")[0];
-//        return path != null ? path.substring(TextUtils.lastIndexOf(path, '/') + 1) : "";
+//        String title = path.substring(TextUtils.lastIndexOf(path, '/') + 1);
+//        return title.split("\\.")[0];
+        return path != null ? path.substring(TextUtils.lastIndexOf(path, '/') + 1) : "";
     }
 }

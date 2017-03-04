@@ -37,14 +37,15 @@ public class FFmpegUtils {
     }
 
 
-    public static void video2Gif(String input, String output, String scale, String startTime, int duration) {
+    public static void video2Gif(String input, String output, String scale, String biteRate, String startTime, int duration) {
         StringBuilder cmdString = new StringBuilder();
         cmdString.append("ffmpeg");
         cmdString.append(" -ss "+ startTime);
         cmdString.append(" -t " + duration);
-        cmdString.append(" -r " + 15);
+        cmdString.append(" -r " + 10);
         cmdString.append(" -i " + input);
         cmdString.append(" -s " + scale);
+        cmdString.append(" -b:v " + biteRate);   //设置码率
         cmdString.append(" " + output);
         new FFmpegAsyncTask(cmdString.toString()).execute();
     }
@@ -76,7 +77,6 @@ public class FFmpegUtils {
         protected Void doInBackground(Object[] params) {
             Log.d(TAG, "video doInBackground() ");
             if (argc > 0) {
-                Log.d(TAG, "video : argc= " + argc + " cmd= \n" + argv.toString());
                 FFmpegUtils.ffmpegcore(argc, argv);
             }
             return null;

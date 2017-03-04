@@ -3,6 +3,7 @@ package com.tanjinc.tmediaplayer.player;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Environment;
@@ -83,8 +84,11 @@ public class MovieController extends RelativeLayout implements IController {
     ImageView mSwitchBtn;
 
     @BindView(R.id.recording_view) RecordingView mRecordingView;
+    @BindView(R.id.rotation_btn)    ImageButton mRotateBtn;
+    @BindView(R.id.back_btn)    ImageButton mBackBtn;
 
     private Context mContext;
+    private Activity mActivity;
     private boolean mIsShowing;
     private IVideoView mPlayer;
 
@@ -97,7 +101,13 @@ public class MovieController extends RelativeLayout implements IController {
 //    private ShareWidget mShareWidget;
     private ArrayList<BaseWidget> mWidgetArray = new ArrayList<>();
 
-    @OnClick({R.id.share_btn, R.id.play, R.id.player_menu_btn, R.id.switch_float_btn, R.id.recording_view})
+    @OnClick({R.id.share_btn,
+            R.id.play,
+            R.id.player_menu_btn,
+            R.id.switch_float_btn,
+            R.id.recording_view,
+            R.id.rotation_btn,
+            R.id.back_btn})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.share_btn:
@@ -133,12 +143,33 @@ public class MovieController extends RelativeLayout implements IController {
                 mContext.sendBroadcast(new Intent(VideoPlayActivity.ACTION_CLOSE_SELF));
                 break;
             case R.id.recording_view:
-
-                Log.d(TAG, "video onClick() mCurrentPostion:" + mCurrentPostion);
+                break;
+            case R.id.rotation_btn:
+                performRotate();
+                break;
+            case R.id.back_btn:
+                closePlayer();
                 break;
             default:
                 break;
         }
+    }
+
+    private void performRotate() {
+        if(mActivity != null) {
+            if (mActivity.getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+                mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            } else {
+                mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            }
+
+        }
+    }
+
+    private void closePlayer() {
+        mPlayer.pause();
+        mHandler.removeCallbacks(progressRunnable);
+        mActivity.finish();
     }
 
 
@@ -151,6 +182,7 @@ public class MovieController extends RelativeLayout implements IController {
         super(context);
         mContext = context;
         mPlayer = player;
+        mActivity = (Activity) context;
         init();
     }
 
@@ -167,7 +199,6 @@ public class MovieController extends RelativeLayout implements IController {
         initRecording();
         addWidgets();
         resetLayout();
-        mHandler.post(progressRunnable);
         KeyboardUtil.addSoftKeyboardChangedListener(mSoftKeyboardChangeListener);
     }
 
@@ -184,7 +215,8 @@ public class MovieController extends RelativeLayout implements IController {
             @Override
             public void onFinish(int duration) {
                 Log.d(TAG, "video onFinish() time=" + duration);
-                mGifname = "/sdcard/"+mPlayer.getTitle()+".gif";
+                String title = mPlayer.getTitle().split("\\.")[0];
+                mGifname = "/sdcard/1/"+title+".gif";
                 int videoWidth = mPlayer.getVideoWidth();
                 int videoHeight = mPlayer.getVideoHeight();
                 int scaleNum;
@@ -193,9 +225,10 @@ public class MovieController extends RelativeLayout implements IController {
                 } else {
                     scaleNum = 1;
                 }
-                String scale = ((int)videoWidth / scaleNum)+"x"+((int)videoHeight / scaleNum);
+                Log.d(TAG, "video onFinish width:" + videoWidth + " height:" + videoHeight);
+                String scale = (videoWidth / scaleNum)+"x"+(videoHeight / scaleNum);
                 String startTime = VideoUtils.length2time(mCurrentPostion);
-                FFmpegUtils.video2Gif(mPlayer.getUri().toString(), mGifname,scale, startTime, duration);
+                FFmpegUtils.video2Gif(mPlayer.getUri().toString(), mGifname,scale, "1000k", startTime, duration);
             }
         });
         FFmpegUtils.setOnCompleteListener(new FFmpegUtils.OnCompleteListener() {
@@ -365,8 +398,8 @@ public class MovieController extends RelativeLayout implements IController {
 
     @Override
     public void start() {
-//        mPlayBtn.setActivated(true);
-//        mHandler.post(progressRunnable);
+        mPlayBtn.setActivated(true);
+        mHandler.post(progressRunnable);
     }
 
     @Override
